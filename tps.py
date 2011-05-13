@@ -22,7 +22,23 @@ class Suite(object):
         self.log_pattern = 'output_%(serial)s_%(timestamp)s_%(test)s.txt'
 
     def run(self):
-        pass
+        ts = timestamp()
+        test_glob = os.path.join(self.path, self.pattern, '.py')
+        sequence = glob.glob(test_glob)
+        for test in sequence:
+            try:
+                name = os.path.splitext(os.path.basename(test))
+                __import__(name, globals(), locals(), ['main'])
+                name()
+            except TpsCritical, e:
+                print 'Tps Critical error, aborting: [%s]' % e.value
+                break
+            except TpsError, e:
+                print 'Tps Error error, continuing: [%s]' % e.value
+            except TpsWarning, e:
+                print 'Tps Warning: [%s]' % e.value
+            finally:
+                pass
 
     def write_cfg(self):
         config = ConfigParser()
