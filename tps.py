@@ -101,8 +101,32 @@ def sha(blob, len=7):
     if len:
         return ret[:len]
 
-if __name__ == '__main__':
+class Cli(cmd.Cmd):
+    def do_board(self, arg):
+        pass
+    def do_serial(self, arg):
+        pass
+    def do_path(self, arg):
+        pass
+    def do_run(self, arg):
+        pass
+    def do_repeat(self, arg):
+        pass
+    def do_save(self, arg):
+        pass
+    def do_log(self, arg):
+        pass
+    def do_log_path(self, arg):
+        pass
 
+    def do_EOF(self, arg):
+        print
+        return True
+
+    def do_quit(self, arg):
+        return True
+
+def main1():
     parser = OptionParser()
     parser.add_option("-c", "--config", dest="config",
                         default=default_config_file,
@@ -113,3 +137,10 @@ if __name__ == '__main__':
     s = Suite(options.config)
     s.write_cfg()
     s.run()
+
+def main2():
+    cli = Cli()
+    cli.cmdloop()
+
+if __name__ == '__main__':
+    main2()
