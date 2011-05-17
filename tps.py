@@ -30,31 +30,38 @@ class Suite(object):
             sys.path.append(self.path)
         for test in sequence:
             testname, ext = os.path.splitext(os.path.basename(test))
-            try:
-                mod = __import__(testname, globals(), locals(), ['main'])
-                mod.main()
-            except TpsCritical, e:
-                print 'Tps Critical error, aborting: [%s]' % e.message
-                break
-            except TpsError, e:
-                print 'Tps Error error, continuing: [%s]' % e.message
-            except TpsUser, e:
-                print 'Tps User error, user intervention required: [%s]' % e.message
-                print 'Error %s found in test named %s. ',
-                while True:
-                    ans = raw_input('Abort or Continue? (A/C) ')
-                    ans = ans.lower()
-                    if ans in ('a', 'c'):
-                        break
-                if ans == 'a':
+            serial = get_serial()
+            ts = timestamp()
+            logname = os.path.join(self.logpath, self.log_pattern % dict(
+                    serial=serial, timestamp=ts, test=testname))
+            tmpout = sys.stdout
+            with open(logname, 'w') as sys.stdout:
+                try:
+                    mod = __import__(testname, globals(), locals(), ['main'])
+                    mod.main()
+                except TpsCritical, e:
+                    print 'Tps Critical error, aborting: [%s]' % e.message
                     break
-                elif ans == 'c':
-                    continue
-            except TpsWarning, e:
-                print 'Tps Warning: [%s]' % e.message
-            finally:
-                print 'ran test ', test
-                pass
+                except TpsError, e:
+                    print 'Tps Error error, continuing: [%s]' % e.message
+                except TpsUser, e:
+                    print 'Tps User error, user intervention required: [%s]' % e.message
+                    print 'Error %s found in test named %s. ',
+                    while True:
+                        ans = raw_input('Abort or Continue? (A/C) ')
+                        ans = ans.lower()
+                        if ans in ('a', 'c'):
+                            break
+                    if ans == 'a':
+                        break
+                    elif ans == 'c':
+                        continue
+                except TpsWarning, e:
+                    print 'Tps Warning: [%s]' % e.message
+                finally:
+                    print 'ran test ', test
+                    pass
+            sys.stdout = tmpout
 
     def write_cfg(self):
         config = ConfigParser()
