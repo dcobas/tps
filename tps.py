@@ -3,6 +3,7 @@
 
 import sys
 import cmd
+import glob
 import os, os.path
 import datetime
 
@@ -23,21 +24,36 @@ class Suite(object):
 
     def run(self):
         ts = timestamp()
-        test_glob = os.path.join(self.path, self.pattern, '.py')
+        test_glob = os.path.join(self.path, self.pattern + '.py')
         sequence = glob.glob(test_glob)
+        if self.path not in sys.path:
+            sys.path.append(self.path)
         for test in sequence:
+            testname, ext = os.path.splitext(os.path.basename(test))
             try:
-                name = os.path.splitext(os.path.basename(test))
-                __import__(name, globals(), locals(), ['main'])
-                name()
+                mod = __import__(testname, globals(), locals(), ['main'])
+                mod.main()
             except TpsCritical, e:
-                print 'Tps Critical error, aborting: [%s]' % e.value
+                print 'Tps Critical error, aborting: [%s]' % e.message
                 break
             except TpsError, e:
-                print 'Tps Error error, continuing: [%s]' % e.value
+                print 'Tps Error error, continuing: [%s]' % e.message
+            except TpsUser, e:
+                print 'Tps User error, user intervention required: [%s]' % e.message
+                print 'Error %s found in test named %s. ',
+                while True:
+                    ans = raw_input('Abort or Continue? (A/C) ')
+                    ans = ans.lower()
+                    if ans in ('a', 'c'):
+                        break
+                if ans == 'a':
+                    break
+                elif ans == 'c':
+                    continue
             except TpsWarning, e:
-                print 'Tps Warning: [%s]' % e.value
+                print 'Tps Warning: [%s]' % e.message
             finally:
+                print 'ran test ', test
                 pass
 
     def write_cfg(self):
@@ -72,7 +88,7 @@ def sha(blob, len=7):
     ret = hash.hexdigest()
     if len:
         return ret[:len]
-    
+
 if __name__ == '__main__':
 
     parser = OptionParser()
@@ -84,3 +100,4 @@ if __name__ == '__main__':
 
     s = Suite(options.config)
     s.write_cfg()
+    s.run()
