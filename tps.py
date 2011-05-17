@@ -72,6 +72,11 @@ class Suite(object):
         with open(self.config, 'wb') as configfile:
             config.write(configfile)
 
+def get_serial():
+    """return serial number of current board to test
+    """
+    return sha(timestamp())
+
 def timestamp():
     """timestamp for now
     """
