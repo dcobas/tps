@@ -80,7 +80,7 @@ def get_serial():
 def timestamp():
     """timestamp for now
     """
-    return datetime.datetime.now().strftime('%Y%m%d.%H%M%S')
+    return datetime.datetime.now().strftime('%Y%m%d.%H%M%S%f')
 
 def sha(blob, len=7):
     """create a sha-160 hash of a binary object
