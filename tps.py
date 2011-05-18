@@ -85,13 +85,14 @@ class Suite(object):
         config = ConfigParser()
 
         config.add_section('global')
-        config.set('global', 'timestamp', timestamp())
-        config.set('global', 'sha', sha('3.14'))
         config.add_section('files')
-        config.set('files', 'path', self.path)
-        config.set('files', 'logs', self.logpath)
-        config.set('files', 'pattern', self.pattern)
-        config.set('files', 'log_pattern', self.log_pattern)
+
+        config.set('global', 'board', self.board)
+        config.set('global', 'serial', self.serial)
+        config.set('files',  'path', self.path)
+        config.set('files',  'logs', self.logpath)
+        config.set('files',  'pattern', self.pattern)
+        config.set('files',  'log_pattern', self.log_pattern)
 
         # Writing our configuration file
         with open(self.config, 'wb') as configfile:
