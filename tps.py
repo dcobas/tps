@@ -116,22 +116,48 @@ def sha(blob, len=7):
         return ret[:len]
 
 class Cli(cmd.Cmd):
+    def __init__(self, suite):
+        # Suite instance manipulated by this cli
+        self.suite = suite
+        cmd.Cmd.__init__(self)
+
     def do_board(self, arg):
-        pass
+        if arg:
+            self.suite.board = arg
+        else:
+            print self.suite.board
+
     def do_serial(self, arg):
-        pass
+        if arg:
+            self.suite.serial = arg
+        else:
+            print self.suite.serial
+
     def do_path(self, arg):
-        pass
+        if arg:
+            self.suite.path = arg
+        else:
+            print self.suite.path
+
     def do_run(self, arg):
         pass
     def do_repeat(self, arg):
         pass
+
     def do_save(self, arg):
-        pass
+        self.suite.write_config()
+
     def do_log(self, arg):
-        pass
+        if arg:
+            self.suite.log = arg
+        else:
+            print self.suite.log
+
     def do_log_path(self, arg):
-        pass
+        if arg:
+            self.suite.log_path = arg
+        else:
+            print self.suite.log_path
 
     def do_EOF(self, arg):
         print
