@@ -120,29 +120,28 @@ def sha(blob, len=7):
     if len:
         return ret[:len]
 
-class Cli(cmd.Cmd):
-    def __init__(self, suite):
-        # Suite instance manipulated by this cli
-        self.suite = suite
+class Cli(cmd.Cmd, Suite):
+    def __init__(self, cfgfilename=default_config_file):
         cmd.Cmd.__init__(self)
+        Suite.__init__(self, cfgfilename)
 
     def do_board(self, arg):
         if arg:
-            self.suite.board = arg
+            self.board = arg
         else:
-            print self.suite.board
+            print self.board
 
     def do_serial(self, arg):
         if arg:
-            self.suite.serial = arg
+            self.serial = arg
         else:
-            print self.suite.serial
+            print self.serial
 
     def do_path(self, arg):
         if arg:
-            self.suite.path = arg
+            self.path = arg
         else:
-            print self.suite.path
+            print self.path
 
     def do_run(self, arg):
         pass
@@ -150,19 +149,19 @@ class Cli(cmd.Cmd):
         pass
 
     def do_save(self, arg):
-        self.suite.write_config()
+        self.write_config()
 
     def do_log(self, arg):
         if arg:
-            self.suite.log = arg
+            self.log = arg
         else:
-            print self.suite.log
+            print self.log
 
     def do_log_path(self, arg):
         if arg:
-            self.suite.log_path = arg
+            self.log_path = arg
         else:
-            print self.suite.log_path
+            print self.log_path
 
     def do_EOF(self, arg):
         print
@@ -184,6 +183,7 @@ def main1():
     s.run()
 
 def main2():
+    s = Suite()
     cli = Cli()
     cli.cmdloop()
 
