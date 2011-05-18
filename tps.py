@@ -17,6 +17,8 @@ default_config_file = 'default.cfg'
 class Suite(object):
     def __init__(self, cfgfilename=default_config_file):
         self.config = cfgfilename
+        self.board = 'SPEC'
+        self.serial = '000000'
         self.path = './tests'
         self.logpath = './logs'
         self.pattern = 'test[0-9][0-9]'
@@ -31,6 +33,8 @@ class Suite(object):
             raise TpsCritical(errmsg)
         config = ConfigParser(cfg)
 
+        self.board       = config.get('global', 'board')
+        self.serial      = config.get('global', 'serial')
         self.path        = config.get('files',  'path')
         self.logpath     = config.get('files',  'logs')
         self.pattern     = config.get('files',  'pattern')
