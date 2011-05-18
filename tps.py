@@ -22,6 +22,20 @@ class Suite(object):
         self.pattern = 'test[0-9][0-9]'
         self.log_pattern = 'output_%(serial)s_%(timestamp)s_%(test)s.txt'
 
+    def read_config(self):
+        try:
+            cfg = file(self.config).read()
+        except IOError:
+            errmsg = 'could not read configuration file {0}'
+            errmsg = errmsg.format(self.config)
+            raise TpsCritical(errmsg)
+        config = ConfigParser(cfg)
+
+        self.path        = config.get('files',  'path')
+        self.logpath     = config.get('files',  'logs')
+        self.pattern     = config.get('files',  'pattern')
+        self.log_pattern = config.get('files',  'log_pattern')
+
     def run(self):
         ts = timestamp()
         test_glob = os.path.join(self.path, self.pattern + '.py')
