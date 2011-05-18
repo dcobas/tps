@@ -77,7 +77,7 @@ class Suite(object):
                     pass
             sys.stdout = tmpout
 
-    def write_cfg(self):
+    def write_config(self):
         config = ConfigParser()
 
         config.add_section('global')
@@ -149,7 +149,7 @@ def main1():
     (options, args) = parser.parse_args()
 
     s = Suite(options.config)
-    s.write_cfg()
+    s.write_config()
     s.run()
 
 def main2():
