@@ -4,6 +4,7 @@
 import sys
 import cmd
 import glob
+import re
 import os, os.path
 import datetime
 
@@ -11,6 +12,7 @@ from ConfigParser import ConfigParser
 from optparse import OptionParser
 from hashlib import sha1 as sha160
 from tpsexcept import *
+from pprint import pprint
 
 default_config_file = 'default.cfg'
 
@@ -31,12 +33,12 @@ class Suite(object):
     def __init__(self, cfgfilename=default_config_file):
         self.config       =  cfgfilename
         self.board        =  'SPEC'
-        self.serial       =  '000000'
+        self.serial       =  ''
         self.path         =  './tests'
         self.logpath      =  './logs'
         self.pattern      =  'test[0-9][0-9]'
         self.sequence     =  []
-        self.log          =  'run_%(board)s_%(serial)s_%(timestamp)s_%(id)s.txt'
+        self.log          = 'run_{0}_{1}_{2}_{3}.txt'
         self.log_pattern  =  'out_%(serial)s_%(timestamp)s_%(test)s.txt'
 
     def read_config(self):
@@ -58,39 +60,66 @@ class Suite(object):
 
     def run(self):
         ts = timestamp()
-        serial = get_serial()
+        if not self.serial:
+            serial = get_serial()
+        else:
+            serial = self.serial
+        runid = sha(self.board + ':' + serial + ':' + ts)
+        logfilename = self.log.format(self.board, serial, ts, runid)
+        logfilename = os.path.join(self.logpath, logfilename)
+        log = file(logfilename, 'wb')
         test_glob = os.path.join(self.path, self.pattern + '.py')
         sequence = glob.glob(test_glob)
+
         if self.path not in sys.path:
             sys.path.append(self.path)
+
+        log.write('test run\n'
+            '    board      = {0}\n'
+            '    serial     = {1}\n'
+            '    timestamp  = {2}\n'
+            '    runid      = {3}\n'.format(
+                self.board, self.serial, ts, runid))
         for test in sequence:
             try:
                 testname = os.path.splitext(os.path.basename(test))[0]
+                shortname= re.match('test(\d\d)', testname).group(1)
                 logname  = self.log_pattern % dict(serial=serial, timestamp=ts, test=testname)
                 logname  = os.path.join(self.logpath, logname)
+                log.write('------------------------\n')
+                log.write('running test {0} = {1}\n'.format(shortname, test))
                 run_test(testname, logname)
             except TpsCritical, e:
-                print 'Tps Critical error, aborting: [%s]' % e.message
+                print 'test [%s]: critical error, aborting: [%s]' % (shortname, e.message)
+                log.write('    critical error in test {0}, exception [{1}]\n'.format(shortname, e.message))
+                log.write('    cannot continue, aborting test suite')
                 break
             except TpsError, e:
-                print 'Tps Error error, continuing: [%s]' % e.message
+                print 'test [%s]: error, continuing: [%s]' % (shortname, e.message)
+                log.write('    error in test {0}, exception [{1}]\n'.format(shortname, e.message))
             except TpsUser, e:
-                print 'Tps User error, user intervention required: [%s]' % e.message
-                print 'Error %s found in test named %s. ',
+                print 'test [%s]: user error, user intervention required: [%s]' % (shortname, e.message)
+                log.write('    error in test {0}, exception [{1}]\n'.format(shortname, e.message))
                 while True:
                     ans = raw_input('Abort or Continue? (A/C) ')
                     ans = ans.lower()
                     if ans in ('a', 'c'):
                         break
                 if ans == 'a':
+                    log.write('    user intervention: abort\n')
                     break
                 elif ans == 'c':
+                    log.write('    user intervention: continue\n')
                     continue
             except TpsWarning, e:
-                print 'Tps Warning: [%s]' % e.message
+                print 'test [%s]: warning: [%s]' % (shortname, e.message)
+                log.write('    warning in test {0}, exception [{1}]\n'.format(shortname, e.message))
+            else:
+                log.write('    OK\n')
             finally:
-                print 'ran test ', test
+                log.write('finished test {0}\n'.format(test))
                 pass
+        log.close()
 
     def write_config(self):
         config = ConfigParser()
@@ -186,10 +215,15 @@ def main1():
     parser.add_option("-c", "--config", dest="config",
                         default=default_config_file,
                         help="config file name", metavar="FILE")
+    parser.add_option("-s", "--serial", dest="serial",
+                        default='000000',
+                        help="board serial number", metavar="FILE")
 
     (options, args) = parser.parse_args()
 
     s = Suite(options.config)
+    if options.serial:
+        s.serial = options.serial
     s.write_config()
     s.run()
 
