@@ -16,13 +16,14 @@ default_config_file = 'default.cfg'
 
 class Suite(object):
     def __init__(self, cfgfilename=default_config_file):
-        self.config = cfgfilename
-        self.board = 'SPEC'
-        self.serial = '000000'
-        self.path = './tests'
-        self.logpath = './logs'
-        self.pattern = 'test[0-9][0-9]'
-        self.log_pattern = 'output_%(serial)s_%(timestamp)s_%(test)s.txt'
+        self.config       =  cfgfilename
+        self.board        =  'SPEC'
+        self.serial       =  '000000'
+        self.path         =  './tests'
+        self.logpath      =  './logs'
+        self.pattern      =  'test[0-9][0-9]'
+        self.sequence     =  []
+        self.log_pattern  =  'output_%(serial)s_%(timestamp)s_%(test)s.txt'
 
     def read_config(self):
         try:
