@@ -14,6 +14,19 @@ from tpsexcept import *
 
 default_config_file = 'default.cfg'
 
+def run_test(testname, logname):
+    """run test testname with output redirected to logname
+    """
+    try:
+        tmpout = sys.stdout
+        with open(logname, 'w') as sys.stdout:
+            mod = __import__(testname, globals(), locals(), ['main'])
+            mod.main()
+    except:
+        raise
+    finally:
+        sys.stdout = tmpout
+
 class Suite(object):
     def __init__(self, cfgfilename=default_config_file):
         self.config       =  cfgfilename
@@ -43,44 +56,39 @@ class Suite(object):
 
     def run(self):
         ts = timestamp()
+        serial = get_serial()
         test_glob = os.path.join(self.path, self.pattern + '.py')
         sequence = glob.glob(test_glob)
         if self.path not in sys.path:
             sys.path.append(self.path)
         for test in sequence:
-            testname, ext = os.path.splitext(os.path.basename(test))
-            serial = get_serial()
-            ts = timestamp()
-            logname = os.path.join(self.logpath, self.log_pattern % dict(
-                    serial=serial, timestamp=ts, test=testname))
-            tmpout = sys.stdout
-            with open(logname, 'w') as sys.stdout:
-                try:
-                    mod = __import__(testname, globals(), locals(), ['main'])
-                    mod.main()
-                except TpsCritical, e:
-                    print 'Tps Critical error, aborting: [%s]' % e.message
-                    break
-                except TpsError, e:
-                    print 'Tps Error error, continuing: [%s]' % e.message
-                except TpsUser, e:
-                    print 'Tps User error, user intervention required: [%s]' % e.message
-                    print 'Error %s found in test named %s. ',
-                    while True:
-                        ans = raw_input('Abort or Continue? (A/C) ')
-                        ans = ans.lower()
-                        if ans in ('a', 'c'):
-                            break
-                    if ans == 'a':
+            try:
+                testname = os.path.splitext(os.path.basename(test))[0]
+                logname  = self.log_pattern % dict(serial=serial, timestamp=ts, test=testname)
+                logname  = os.path.join(self.logpath, logname)
+                run_test(testname, logname)
+            except TpsCritical, e:
+                print 'Tps Critical error, aborting: [%s]' % e.message
+                break
+            except TpsError, e:
+                print 'Tps Error error, continuing: [%s]' % e.message
+            except TpsUser, e:
+                print 'Tps User error, user intervention required: [%s]' % e.message
+                print 'Error %s found in test named %s. ',
+                while True:
+                    ans = raw_input('Abort or Continue? (A/C) ')
+                    ans = ans.lower()
+                    if ans in ('a', 'c'):
                         break
-                    elif ans == 'c':
-                        continue
-                except TpsWarning, e:
-                    print 'Tps Warning: [%s]' % e.message
-                finally:
-                    print 'ran test ', test
-                    pass
-            sys.stdout = tmpout
+                if ans == 'a':
+                    break
+                elif ans == 'c':
+                    continue
+            except TpsWarning, e:
+                print 'Tps Warning: [%s]' % e.message
+            finally:
+                print 'ran test ', test
+                pass
 
     def write_config(self):
         config = ConfigParser()
@@ -189,4 +197,4 @@ def main2():
     cli.cmdloop()
 
 if __name__ == '__main__':
-    main2()
+    main1()
