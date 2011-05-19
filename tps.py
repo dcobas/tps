@@ -22,7 +22,7 @@ def run_test(testname, logname):
     try:
         tmpout = sys.stdout
         with open(logname, 'w') as sys.stdout:
-            mod = __import__(testname, globals(), locals(), ['main'])
+            mod = __import__(testname, globals(), locals(), [])
             mod.main()
     except:
         raise
