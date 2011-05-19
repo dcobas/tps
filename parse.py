@@ -10,6 +10,7 @@ tokens = (
     'LPAREN',
     'RPAREN',
     'DASH',
+    'TEST',
 )
 
 t_NUMBER = r'[0-9]+'
@@ -17,6 +18,7 @@ t_REPEAT = r'repeat'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_DASH   = r'-'
+t_TEST   = r'test'
 
 t_ignore = ' \t'
 
@@ -47,8 +49,9 @@ def p_batch_range(p):
     p[0] = [ 'range', p[1], p[3] ]
 
 def p_tst(p):
-    'tst : NUMBER'
-    p[0] = p[1]
+    '''tst : NUMBER
+           | TEST NUMBER'''
+    p[0] = p[len(p)-1]
 
 def p_error(p):
     print 'syntax error!'
