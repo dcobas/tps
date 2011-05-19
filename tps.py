@@ -102,7 +102,7 @@ class Suite(object):
 def get_serial():
     """return serial number of current board to test
     """
-    return sha(timestamp())
+    return raw_input('board serial number? ').strip()
 
 def timestamp():
     """timestamp for now
