@@ -58,6 +58,28 @@ def p_error(p):
 
 parser = yacc.yacc()
 
+class Sequence(object):
+    pass
+
+class Battery(Sequence, list):
+    def traverse(self):
+        for item in self:
+            print item
+
+class Tst(Sequence):
+    def traverse(self):
+        print self.tag
+
+class Loop(Sequence):
+    def traverse(self):
+        for i in range(self.number):
+            self.sequence.traverse()
+
+class Range(Sequence):
+    def traverse(self):
+        for i in range(self.fro, self.to+1):
+            print i
+
 if __name__ == '__main__':
     result = parser.parse(sys.argv[1])
     print result
