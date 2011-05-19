@@ -36,7 +36,8 @@ class Suite(object):
         self.logpath      =  './logs'
         self.pattern      =  'test[0-9][0-9]'
         self.sequence     =  []
-        self.log_pattern  =  'output_%(serial)s_%(timestamp)s_%(test)s.txt'
+        self.log          =  'run_%(board)s_%(serial)s_%(timestamp)s_%(id)s.txt'
+        self.log_pattern  =  'out_%(serial)s_%(timestamp)s_%(test)s.txt'
 
     def read_config(self):
         try:
@@ -52,6 +53,7 @@ class Suite(object):
         self.path        = config.get('files',  'path')
         self.logpath     = config.get('files',  'logs')
         self.pattern     = config.get('files',  'pattern')
+        self.log         = config.get('files',  'log')
         self.log_pattern = config.get('files',  'log_pattern')
 
     def run(self):
