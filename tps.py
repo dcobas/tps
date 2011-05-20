@@ -57,25 +57,24 @@ class Suite(object):
             raise TpsCritical(errmsg)
         config = ConfigParser(cfg)
 
-        self.board       = config.get('global', 'board')
-        self.serial      = config.get('global', 'serial')
-        self.path        = config.get('files',  'test_path')
-        self.logpath     = config.get('files',  'log_path')
-        self.pattern     = config.get('files',  'log_name')
-        self.log_pattern = config.get('files',  'log_pattern')
+        self.board        =  config.get('global',  'board')
+        self.serial       =  config.get('global',  'serial')
+        self.test_path    =  config.get('global',   'test_path')
+        self.log_path     =  config.get('global',   'log_path')
+        self.log_name     =  config.get('global',   'log_name')
+        self.log_pattern  =  config.get('global',   'log_pattern')
 
     def write_config(self):
         config = ConfigParser()
 
         config.add_section('global')
-        config.add_section('files')
 
         config.set('global', 'board', self.board)
         config.set('global', 'serial', self.serial)
-        config.set('files',  'path', self.path)
-        config.set('files',  'logs', self.logpath)
-        config.set('files',  'pattern', self.pattern)
-        config.set('files',  'log_pattern', self.log_pattern)
+        config.set('global', 'test_path', self.path)
+        config.set('global', 'log_path', self.logpath)
+        config.set('global', 'log_name', self.pattern)
+        config.set('global', 'log_pattern', self.log_pattern)
 
         # Writing our configuration file
         with open(self.config, 'wb') as configfile:
