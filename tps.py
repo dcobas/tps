@@ -228,6 +228,21 @@ class Cli(cmd.Cmd, Suite):
         "exit cli"
         return True
 
+    def do_show(self, arg):
+        "show current configuration of suite"
+
+        params_to_list = (
+            'board',
+            'serial',
+            'test_path',
+            'log_path',
+            'repeat',
+            'random', )
+        for param in params_to_list:
+            if param in self.__dict__:
+                print '%-12s' % (param + ':'),
+                print self.__getattribute__(param)
+
     do_q = do_quit
     do_h = cmd.Cmd.do_help
 
