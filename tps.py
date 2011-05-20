@@ -46,7 +46,9 @@ class Suite(object):
                 if self.__getattribute__(fieldname) is None ]
         return missing
 
-    def read_config(self):
+    def read_config(self, name=None):
+        if name:
+            self.config = name
         try:
             cfg = file(self.config).read()
         except IOError:
