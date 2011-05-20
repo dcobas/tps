@@ -247,7 +247,8 @@ class Cli(cmd.Cmd, Suite):
     do_h = cmd.Cmd.do_help
 
 def main1():
-    parser = OptionParser()
+    usage = '%prog: [options] test ...'
+    parser = OptionParser(usage)
     parser.add_option("-c", "--config", dest="config",
                         default="tpsdefault.cfg",
                         help="config file name")
