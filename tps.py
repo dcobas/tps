@@ -252,7 +252,7 @@ def main1():
     parser.add_option("-c", "--config", dest="config",
                         default="tpsdefault.cfg",
                         help="config file name")
-    parser.add_option("--cli", dest="cli", action="store_true",
+    parser.add_option("-C", "--cli", dest="cli", action="store_true",
                         help="enter command-line interpreter")
     parser.add_option("-b", "--board", dest="board",
                         help="board name (e.g. -b SPEC)", metavar="NAME")
@@ -262,8 +262,11 @@ def main1():
                         help="path to test files", metavar="PATH")
     parser.add_option("-l", "--log-path", dest="log_path",
                         help="path to log files", metavar="PATH")
-    parser.add_option("-o", "--log-name", dest="log_name",
-                        help="main log file pattern")
+    parser.add_option("-n", "--ntimes", dest="repeat",
+                        help="number of times to repeat the batch of tests",
+                        metavar="NUMBER")
+    parser.add_option("-r", "--randomize", action="store_true",
+                        help="run the batch in random order", )
 
     (options, args) = parser.parse_args()
 
