@@ -34,12 +34,14 @@ def run_test(testname, logname):
 
 class Suite(object):
     def __init__(self, cfgfilename=default_config_file):
-        self.config       =  default_config_file
-        self.log_pattern  =  default_log_pattern
+
         self.required     =  [ 'board', 'serial', 'test_path',
-                                'log_path', 'log_name', 'sequence' ]
+                                'log_path', 'sequence' ]
         for fieldname in self.required:
             self.__setattr__(fieldname, None)
+        self.config       =  default_config_file
+        self.log_pattern  =  default_log_pattern
+        self.log_name     =  default_log_name
 
     def missing(self):
         """report missing fields before suite run"""
@@ -245,7 +247,6 @@ def main1():
     s = Cli(options.config)
     s.__dict__.update(options.__dict__)
     s.sequence = args
-    s.log_name = default_log_name
     if options.cli:
         s.cmdloop()
     else:
