@@ -177,6 +177,7 @@ class Cli(cmd.Cmd, Suite):
     def __init__(self, cfgfilename=default_config_file):
         cmd.Cmd.__init__(self)
         Suite.__init__(self, cfgfilename)
+        self.ruler = ''
 
     def do_board(self, arg):
         if arg:
@@ -190,25 +191,11 @@ class Cli(cmd.Cmd, Suite):
         else:
             print self.serial
 
-    def do_path(self, arg):
+    def do_test_path(self, arg):
         if arg:
-            self.path = arg
+            self.test_path = arg
         else:
-            print self.path
-
-    def do_run(self, arg):
-        pass
-    def do_repeat(self, arg):
-        pass
-
-    def do_save(self, arg):
-        self.write_config()
-
-    def do_log(self, arg):
-        if arg:
-            self.log = arg
-        else:
-            print self.log
+            print self.test_path
 
     def do_log_path(self, arg):
         if arg:
@@ -216,12 +203,24 @@ class Cli(cmd.Cmd, Suite):
         else:
             print self.log_path
 
+    def do_save(self, arg):
+        self.write_config()
+
+    def do_run(self, arg):
+        pass
+    def do_repeat(self, arg):
+        pass
+
     def do_EOF(self, arg):
         print
         return True
 
     def do_quit(self, arg):
+        "exit cli"
         return True
+
+    do_q = do_quit
+    do_h = cmd.Cmd.do_help
 
 def main1():
     parser = OptionParser()
@@ -243,13 +242,14 @@ def main1():
 
     (options, args) = parser.parse_args()
 
-    s = Suite(options.config)
+    s = Cli(options.config)
     s.__dict__.update(options.__dict__)
     s.sequence = args
     s.log_name = default_log_name
-
-    s.write_config()
-    s.run()
+    if options.cli:
+        s.cmdloop()
+    else:
+        s.run()
 
 def main2():
     s = Suite()
