@@ -14,8 +14,10 @@ from hashlib import sha1 as sha160
 from tpsexcept import *
 from pprint import pprint
 
-default_config_file = 'default.cfg'
-default_log_pattern = 'test_%(board)s_%(serial)s_%(number)s_%(timestamp)s.txt'
+default_config_file  = 'tpsdefault.cfg'
+default_log_pattern  = 'tps_%(board)s_%(serial)s_%(number)s_%(timestamp)s.txt'
+default_log_name     = 'tps_run_{0}_{1}_{2}_{3}.txt'
+default_test_pattern = 'test[0-9][0-9]'
 
 def run_test(testname, logname):
     """run test testname with output redirected to logname
@@ -57,12 +59,12 @@ class Suite(object):
             raise TpsCritical(errmsg)
         config = ConfigParser(cfg)
 
-        self.board        =  config.get('global',  'board')
-        self.serial       =  config.get('global',  'serial')
-        self.test_path    =  config.get('global',   'test_path')
-        self.log_path     =  config.get('global',   'log_path')
-        self.log_name     =  config.get('global',   'log_name')
-        self.log_pattern  =  config.get('global',   'log_pattern')
+        self.board        =  config.get('global', 'board')
+        self.serial       =  config.get('global', 'serial')
+        self.test_path    =  config.get('global', 'test_path')
+        self.log_path     =  config.get('global', 'log_path')
+        self.log_name     =  config.get('global', 'log_name')
+        self.log_pattern  =  config.get('global', 'log_pattern')
 
     def write_config(self):
         config = ConfigParser()
@@ -71,9 +73,9 @@ class Suite(object):
 
         config.set('global', 'board', self.board)
         config.set('global', 'serial', self.serial)
-        config.set('global', 'test_path', self.path)
-        config.set('global', 'log_path', self.logpath)
-        config.set('global', 'log_name', self.pattern)
+        config.set('global', 'test_path', self.test_path)
+        config.set('global', 'log_path', self.log_path)
+        config.set('global', 'log_name', self.log_name)
         config.set('global', 'log_pattern', self.log_pattern)
 
         # Writing our configuration file
@@ -82,19 +84,23 @@ class Suite(object):
 
     def run(self):
         ts = timestamp()
-        if not self.serial:
-            serial = get_serial()
-        else:
-            serial = self.serial
-        runid = sha(self.board + ':' + serial + ':' + ts)
-        logfilename = self.log.format(self.board, serial, ts, runid)
-        logfilename = os.path.join(self.logpath, logfilename)
+        missing = self.missing()
+        if missing:
+            print 'cannot run with missing parameters,',
+            print 'please supply:',
+            for f in missing:
+                print f,
+            print
+            return
+        runid = sha(self.board + ':' + self.serial + ':' + ts)
+        logfilename = self.log_name.format(self.board, self.serial, ts, runid)
+        logfilename = os.path.join(self.log_path, logfilename)
         log = file(logfilename, 'wb')
-        test_glob = os.path.join(self.path, self.pattern + '.py')
+        test_glob = os.path.join(self.test_path, default_test_pattern + '.py')
         sequence = glob.glob(test_glob)
 
-        if self.path not in sys.path:
-            sys.path.append(self.path)
+        if self.test_path not in sys.path:
+            sys.path.append(self.test_path)
 
         log.write('test run\n'
             '    board      = {0}\n'
@@ -106,8 +112,10 @@ class Suite(object):
             try:
                 testname = os.path.splitext(os.path.basename(test))[0]
                 shortname= re.match('test(\d\d)', testname).group(1)
-                logname  = self.log_pattern % dict(serial=serial, timestamp=ts, test=testname)
-                logname  = os.path.join(self.logpath, logname)
+                logname  = self.log_pattern % dict(board=self.board,
+                                serial=self.serial, timestamp=ts,
+                                number=shortname)
+                logname  = os.path.join(self.log_path, logname)
                 log.write('------------------------\n')
                 log.write('running test {0} = {1}\n'.format(shortname, test))
                 run_test(testname, logname)
@@ -218,17 +226,28 @@ class Cli(cmd.Cmd, Suite):
 def main1():
     parser = OptionParser()
     parser.add_option("-c", "--config", dest="config",
-                        default=default_config_file,
-                        help="config file name", metavar="FILE")
+                        default="tpsdefault.cfg",
+                        help="config file name")
+    parser.add_option("--cli", dest="cli", action="store_true",
+                        help="enter command-line interpreter")
+    parser.add_option("-b", "--board", dest="board",
+                        help="board name (e.g. -b SPEC)", metavar="NAME")
     parser.add_option("-s", "--serial", dest="serial",
-                        default='000000',
-                        help="board serial number", metavar="FILE")
+                        help="board serial number", metavar="SERIAL")
+    parser.add_option("-t", "--test-path", dest="test_path",
+                        help="path to test files", metavar="PATH")
+    parser.add_option("-l", "--log-path", dest="log_path",
+                        help="path to log files", metavar="PATH")
+    parser.add_option("-o", "--log-name", dest="log_name",
+                        help="main log file pattern")
 
     (options, args) = parser.parse_args()
 
     s = Suite(options.config)
-    if options.serial:
-        s.serial = options.serial
+    s.__dict__.update(options.__dict__)
+    s.sequence = args
+    s.log_name = default_log_name
+
     s.write_config()
     s.run()
 
