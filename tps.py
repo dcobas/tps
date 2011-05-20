@@ -17,7 +17,8 @@ from pprint import pprint
 default_config_file  = 'tpsdefault.cfg'
 default_log_pattern  = 'tps_%(board)s_%(serial)s_%(number)s_%(timestamp)s.txt'
 default_log_name     = 'tps_run_{0}_{1}_{2}_{3}.txt'
-default_test_pattern = 'test[0-9][0-9]'
+default_test_pattern = r'test[0-9][0-9]'
+default_test_syntax  = r'(test)?(\d?\d)'
 
 def run_test(testname, logname):
     """run test testname with output redirected to logname
@@ -269,9 +270,20 @@ def main1():
                         help="run the batch in random order", )
 
     (options, args) = parser.parse_args()
+    if not args:
+        parser.print_usage()
+        return
+    invalid_args = [ arg for arg in args
+            if not re.match(default_test_syntax, arg) ]
+    if invalid_args:
+        print 'invalid test names, aborting:',
+        for i in invalid_args: print i,
+        print
+        return
 
     s = Cli(options.config)
     s.__dict__.update(options.__dict__)
+
     s.sequence = args
     if options.cli:
         s.cmdloop()
