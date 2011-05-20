@@ -62,6 +62,23 @@ class Suite(object):
         self.pattern     = config.get('files',  'log_name')
         self.log_pattern = config.get('files',  'log_pattern')
 
+    def write_config(self):
+        config = ConfigParser()
+
+        config.add_section('global')
+        config.add_section('files')
+
+        config.set('global', 'board', self.board)
+        config.set('global', 'serial', self.serial)
+        config.set('files',  'path', self.path)
+        config.set('files',  'logs', self.logpath)
+        config.set('files',  'pattern', self.pattern)
+        config.set('files',  'log_pattern', self.log_pattern)
+
+        # Writing our configuration file
+        with open(self.config, 'wb') as configfile:
+            config.write(configfile)
+
     def run(self):
         ts = timestamp()
         if not self.serial:
@@ -124,23 +141,6 @@ class Suite(object):
                 log.write('finished test {0}\n'.format(test))
                 pass
         log.close()
-
-    def write_config(self):
-        config = ConfigParser()
-
-        config.add_section('global')
-        config.add_section('files')
-
-        config.set('global', 'board', self.board)
-        config.set('global', 'serial', self.serial)
-        config.set('files',  'path', self.path)
-        config.set('files',  'logs', self.logpath)
-        config.set('files',  'pattern', self.pattern)
-        config.set('files',  'log_pattern', self.log_pattern)
-
-        # Writing our configuration file
-        with open(self.config, 'wb') as configfile:
-            config.write(configfile)
 
 def get_serial():
     """return serial number of current board to test
