@@ -211,7 +211,14 @@ class Cli(cmd.Cmd, Suite):
     def do_run(self, arg):
         pass
     def do_repeat(self, arg):
-        pass
+        if arg:
+            try:
+                self.repeat = int(arg)
+            except ValueError:
+                print arg, 'is not an integer'
+        else:
+            print self.repeat
+
 
     def do_EOF(self, arg):
         print
