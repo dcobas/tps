@@ -15,6 +15,7 @@ from tpsexcept import *
 from pprint import pprint
 
 default_config_file = 'default.cfg'
+default_log_pattern = 'test_%(board)s_%(serial)s_%(number)s_%(timestamp)s.txt'
 
 def run_test(testname, logname):
     """run test testname with output redirected to logname
@@ -31,15 +32,19 @@ def run_test(testname, logname):
 
 class Suite(object):
     def __init__(self, cfgfilename=default_config_file):
-        self.config       =  cfgfilename
-        self.board        =  'SPEC'
-        self.serial       =  ''
-        self.path         =  './tests'
-        self.logpath      =  './logs'
-        self.pattern      =  'test[0-9][0-9]'
-        self.sequence     =  []
-        self.log          = 'run_{0}_{1}_{2}_{3}.txt'
-        self.log_pattern  =  'out_%(serial)s_%(timestamp)s_%(test)s.txt'
+        self.config       =  default_config_file
+        self.log_pattern  =  default_log_pattern
+        self.required     =  [ 'board', 'serial', 'test_path',
+                                'log_path', 'log_name', 'sequence' ]
+        for fieldname in self.required:
+            self.__setattr__(fieldname, None)
+
+    def missing(self):
+        """report missing fields before suite run"""
+
+        missing = [ fieldname for fieldname in self.required
+                if self.__getattribute__(fieldname) is None ]
+        return missing
 
     def read_config(self):
         try:
@@ -52,10 +57,9 @@ class Suite(object):
 
         self.board       = config.get('global', 'board')
         self.serial      = config.get('global', 'serial')
-        self.path        = config.get('files',  'path')
-        self.logpath     = config.get('files',  'logs')
-        self.pattern     = config.get('files',  'pattern')
-        self.log         = config.get('files',  'log')
+        self.path        = config.get('files',  'test_path')
+        self.logpath     = config.get('files',  'log_path')
+        self.pattern     = config.get('files',  'log_name')
         self.log_pattern = config.get('files',  'log_pattern')
 
     def run(self):
