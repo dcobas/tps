@@ -18,7 +18,7 @@ default_config_file  = 'tpsdefault.cfg'
 default_log_pattern  = 'tps_%(board)s_%(serial)s_%(number)s_%(timestamp)s.txt'
 default_log_name     = 'tps_run_{0}_{1}_{2}_{3}.txt'
 default_test_pattern = r'test[0-9][0-9]'
-default_test_syntax  = r'(test)?(\d?\d)'
+default_test_syntax  = r'(test)?(\d\d)'
 
 def run_test(testname, logname):
     """run test testname with output redirected to logname
@@ -247,8 +247,23 @@ class Cli(cmd.Cmd, Suite):
     do_q = do_quit
     do_h = cmd.Cmd.do_help
 
+def normalize_testname(name):
+
+    if name[:4] == 'test':
+        return name[4:]
+    return name
+
+def validate_args(args):
+
+    valid_args = [ normalize_testname(arg) for arg in args
+            if re.match(default_test_syntax, arg) ]
+    invalid_args = [ arg for arg in args
+            if not re.match(default_test_syntax, arg) ]
+    return valid_args, invalid_args
+
 def main1():
-    usage = '%prog: [options] test ...'
+
+    usage = '%prog: [options] test ...\nrun %prog --help for more help'
     parser = OptionParser(usage)
     parser.add_option("-c", "--config", dest="config",
                         default="tpsdefault.cfg",
@@ -267,24 +282,25 @@ def main1():
                         help="number of times to repeat the batch of tests",
                         metavar="NUMBER")
     parser.add_option("-r", "--randomize", action="store_true",
+                        default=False,
                         help="run the batch in random order", )
 
     (options, args) = parser.parse_args()
+
     if not args:
         parser.print_usage()
         return
-    invalid_args = [ arg for arg in args
-            if not re.match(default_test_syntax, arg) ]
-    if invalid_args:
+    valid, invalid = validate_args(args)
+    if invalid:
         print 'invalid test names, aborting:',
-        for i in invalid_args: print i,
+        for i in invalid: print i,
         print
         return
 
     s = Cli(options.config)
     s.__dict__.update(options.__dict__)
-
     s.sequence = args
+
     if options.cli:
         s.cmdloop()
     else:
