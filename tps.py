@@ -308,6 +308,7 @@ def main1():
 
     (options, args) = parser.parse_args()
 
+    # validate arguments and set up Suite object
     if not args:
         parser.print_usage()
         return
