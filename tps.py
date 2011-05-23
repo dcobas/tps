@@ -7,6 +7,7 @@ import glob
 import re
 import os, os.path
 import datetime
+import random
 
 from ConfigParser import ConfigParser
 from optparse import OptionParser
@@ -85,6 +86,28 @@ class Suite(object):
         with open(self.config, 'wb') as configfile:
             config.write(configfile)
 
+    def compute_run(self):
+        if not self.sequence:
+            raise TpsNoBatch
+        if not self.repeat:
+            repeat = 1
+        else:
+            repeat = int(self.repeat)
+
+        run = []
+        for testno in self.sequence:
+            test_glob = os.path.join(self.test_path, 'test' + testno + '.py')
+            files = glob.glob(test_glob)
+            if not files:
+                print files, test_glob
+                raise TpsBadTestNo('no test number [%s], aborting' % testno)
+            run.append(files[0])
+
+        if self.randomize:
+            random.shuffle(run)
+
+        return repeat * run
+
     def run(self):
         ts = timestamp()
         missing = self.missing()
@@ -99,8 +122,7 @@ class Suite(object):
         logfilename = self.log_name.format(self.board, self.serial, ts, runid)
         logfilename = os.path.join(self.log_path, logfilename)
         log = file(logfilename, 'wb')
-        test_glob = os.path.join(self.test_path, default_test_pattern + '.py')
-        sequence = glob.glob(test_glob)
+        sequence = self.compute_run()
 
         if self.test_path not in sys.path:
             sys.path.append(self.test_path)
@@ -299,7 +321,15 @@ def main1():
 
     s = Cli(options.config)
     s.__dict__.update(options.__dict__)
-    s.sequence = args
+    s.sequence = valid
+    if not s.repeat:
+        s.repeat = 1
+    else:
+        try:
+            s.repeat = int(options.repeat)
+        except ValueError:
+            print 'repeat value must be an int: [%s]' % options.repeat
+            return
 
     if options.cli:
         s.cmdloop()
