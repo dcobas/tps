@@ -172,7 +172,6 @@ class Suite(object):
             else:
                 log.write('    OK\n')
             finally:
-                log.write('finished test {0}\n'.format(test))
                 pass
         log.close()
 
