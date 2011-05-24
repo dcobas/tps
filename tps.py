@@ -13,7 +13,6 @@ from ConfigParser import ConfigParser
 from optparse import OptionParser
 from hashlib import sha1 as sha160
 from tpsexcept import *
-from pprint import pprint
 
 default_config_file  = 'tpsdefault.cfg'
 default_log_pattern  = 'tps_%(board)s_%(serial)s_%(number)s_%(timestamp)s.txt'
