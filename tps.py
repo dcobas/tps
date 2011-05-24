@@ -6,6 +6,7 @@ import cmd
 import glob
 import re
 import os, os.path
+import stat
 import datetime
 import random
 
@@ -95,14 +96,24 @@ class Suite(object):
             msg = 'invalid serial number [{0}]'.format(self.serial)
             raise TpsInvalid(msg)
 
-        mode = os.stat(self.test_path)[stat.S_IMODE]
-        if not (stat.S_ISDIR(mode) and stat.S_IWUSR & mode):
+        try:
+            tmp = os.tempnam(self.test_path)
+            open(tmp, 'w')
+            os.unlink(tmp)
+        except RuntimeWarning:
+            pass
+        except IOError:
             msg = 'invalid test path [{0}]'.format(self.test_path)
             raise TpsInvalid(msg)
 
-        mode = os.stat(self.log_path)[stat.S_IMODE]
-        if not (stat.S_ISDIR(mode) and stat.S_IWUSR & mode):
-            msg = 'invalid log path [{0}]'.format(self.test_path)
+        try:
+            tmp = os.tempnam(self.log_path)
+            open(tmp, 'w')
+            os.unlink(tmp)
+        except RuntimeWarning:
+            pass
+        except:
+            msg = 'invalid log path [{0}]'.format(self.log_path)
             raise TpsInvalid(msg)
 
         if not self.repeat:
@@ -128,25 +139,17 @@ class Suite(object):
         if self.randomize:
             random.shuffle(run)
 
-        self.run = repeat * run
+        self.run_ = self.repeat * run
 
-        return self.run
+        return self.run_
 
     def run(self):
-        ts = timestamp()
-        missing = self.missing()
-        if missing:
-            print 'cannot run with missing parameters,',
-            print 'please supply:',
-            for f in missing:
-                print f,
-            print
-            return
-        runid = sha(self.board + ':' + self.serial + ':' + ts)
+        sequence = self.validate_and_compute_run()
+        ts          = timestamp()
+        runid       = sha(self.board + ':' + self.serial + ':' + ts)
         logfilename = self.log_name.format(self.board, self.serial, ts, runid)
         logfilename = os.path.join(self.log_path, logfilename)
-        log = file(logfilename, 'wb')
-        sequence = self.validate_and_compute_run()
+        log         = file(logfilename, 'wb')
 
         if self.test_path not in sys.path:
             sys.path.append(self.test_path)
@@ -308,7 +311,8 @@ def validate_args(args):
 
 def main1():
 
-    usage = '%prog: [options] test ...\nrun %prog --help for more help'
+    usage = ( '%prog: [options] test ...\n'
+            'run %prog with option -h or --help for more help' )
     parser = OptionParser(usage)
     parser.add_option("-c", "--config", dest="config",
                         default=default_config_file,
@@ -329,6 +333,8 @@ def main1():
     parser.add_option("-r", "--randomize", action="store_true",
                         default=False,
                         help="run the batch in random order", )
+    parser.add_option("-w", "--write-config", action="store_true",
+                        help="write configuration data to config file", )
 
     (options, args) = parser.parse_args()
 
@@ -346,14 +352,16 @@ def main1():
     s = Cli(options.config)
     s.__dict__.update(options.__dict__)
     s.sequence = valid
-    if not s.repeat:
-        s.repeat = 1
-    else:
-        try:
-            s.repeat = int(options.repeat)
-        except ValueError:
-            print 'repeat value must be an int: [%s]' % options.repeat
-            return
+    try:
+        s.validate_and_compute_run()
+    except TpsInvalid, e:
+        print 'bad parameters:', e.message
+        return
+
+    # decide what to do
+    if options.write_config:
+        s.write_config()
+        return
 
     if options.cli:
         s.cmdloop()

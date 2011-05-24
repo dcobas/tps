@@ -20,15 +20,16 @@ class TpsWarning(TpsException):
     """warning, a cautionary message should be displayed"""
     pass
 
-class TpsNoBatch(TpsException):
+class TpsInvalid(TpsException):
+    """reserved: invalid parameters"""
+
+class TpsNoBatch(TpsInvalid):
     """reserved: a suite was created without batch of tests to run"""
     pass
 
-class TpsBadTestNo(TpsException):
+class TpsBadTestNo(TpsInvalid):
     """reserved: a bad test number was given"""
     pass
 
-
 if __name__ == '__main__':
     pass
-
