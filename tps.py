@@ -286,7 +286,7 @@ def main1():
     usage = '%prog: [options] test ...\nrun %prog --help for more help'
     parser = OptionParser(usage)
     parser.add_option("-c", "--config", dest="config",
-                        default="tpsdefault.cfg",
+                        default=default_config_file,
                         help="config file name")
     parser.add_option("-C", "--cli", dest="cli", action="store_true",
                         help="enter command-line interpreter")
