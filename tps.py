@@ -85,14 +85,37 @@ class Suite(object):
         with open(self.config, 'wb') as configfile:
             config.write(configfile)
 
-    def compute_run(self):
-        if not self.sequence:
-            raise TpsNoBatch
-        if not self.repeat:
-            repeat = 1
-        else:
-            repeat = int(self.repeat)
+    def validate_and_compute_run(self):
+        """validate run paramenters"""
 
+        if not self.board:
+            msg = 'invalid board name [{0}]'.format(self.board)
+            raise TpsInvalid(msg)
+        if not self.serial:
+            msg = 'invalid serial number [{0}]'.format(self.serial)
+            raise TpsInvalid(msg)
+
+        mode = os.stat(self.test_path)[stat.S_IMODE]
+        if not (stat.S_ISDIR(mode) and stat.S_IWUSR & mode):
+            msg = 'invalid test path [{0}]'.format(self.test_path)
+            raise TpsInvalid(msg)
+
+        mode = os.stat(self.log_path)[stat.S_IMODE]
+        if not (stat.S_ISDIR(mode) and stat.S_IWUSR & mode):
+            msg = 'invalid log path [{0}]'.format(self.test_path)
+            raise TpsInvalid(msg)
+
+        if not self.repeat:
+            self.repeat = 1
+        else:
+            try:
+                self.repeat = int(self.repeat)
+            except ValueError:
+                msg = 'invalid repeat factor [{0}]'.format(self.repeat)
+                raise TpsInvalid(msg)
+
+        if not self.sequence:
+            raise TpsNoBatch('null test sequence')
         run = []
         for testno in self.sequence:
             test_glob = os.path.join(self.test_path, 'test' + testno + '.py')
@@ -105,7 +128,9 @@ class Suite(object):
         if self.randomize:
             random.shuffle(run)
 
-        return repeat * run
+        self.run = repeat * run
+
+        return self.run
 
     def run(self):
         ts = timestamp()
@@ -121,7 +146,7 @@ class Suite(object):
         logfilename = self.log_name.format(self.board, self.serial, ts, runid)
         logfilename = os.path.join(self.log_path, logfilename)
         log = file(logfilename, 'wb')
-        sequence = self.compute_run()
+        sequence = self.validate_and_compute_run()
 
         if self.test_path not in sys.path:
             sys.path.append(self.test_path)
