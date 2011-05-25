@@ -309,7 +309,7 @@ def validate_args(args):
             if not re.match(default_test_syntax, arg) ]
     return valid_args, invalid_args
 
-def main1():
+def main():
 
     usage = ( '%prog: [options] test ...\n'
             'run %prog with option -h or --help for more help' )
@@ -368,10 +368,5 @@ def main1():
     else:
         s.run()
 
-def main2():
-    s = Suite()
-    cli = Cli()
-    cli.cmdloop()
-
 if __name__ == '__main__':
-    main1()
+    main()
