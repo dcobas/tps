@@ -68,7 +68,7 @@ class Suite(object):
         self.test_path    =  config.get('global', 'test_path')
         self.log_path     =  config.get('global', 'log_path')
 
-    def write_config(self):
+    def save(self):
         config = ConfigParser()
 
         config.add_section('global')
@@ -373,7 +373,7 @@ def main():
 
     # decide what to do
     if options.write_config:
-        s.write_config()
+        s.save()
         return
 
     if options.cli:
