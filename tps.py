@@ -67,20 +67,18 @@ class Suite(object):
         self.serial       =  config.get('global', 'serial')
         self.test_path    =  config.get('global', 'test_path')
         self.log_path     =  config.get('global', 'log_path')
-        self.log_name     =  config.get('global', 'log_name')
-        self.log_pattern  =  config.get('global', 'log_pattern')
 
     def write_config(self):
         config = ConfigParser()
 
         config.add_section('global')
-
         config.set('global', 'board', self.board)
         config.set('global', 'serial', self.serial)
         config.set('global', 'test_path', self.test_path)
         config.set('global', 'log_path', self.log_path)
-        config.set('global', 'log_name', self.log_name)
-        config.set('global', 'log_pattern', self.log_pattern)
+        config.set('global', 'sequence', self.sequence)
+        config.set('global', 'repeat', self.repeat)
+        config.set('global', 'randomize', self.randomize)
 
         # Writing our configuration file
         configfile = open(self.config, 'wb')
@@ -162,6 +160,7 @@ class Suite(object):
             '    timestamp  = {2}\n'
             '    runid      = {3}\n'.format(
                 self.board, self.serial, ts, runid))
+        failures = []
         for test in sequence:
             try:
                 testname = os.path.splitext(os.path.basename(test))[0]
@@ -177,13 +176,16 @@ class Suite(object):
                 print 'test [%s]: critical error, aborting: [%s]' % (shortname, e.message)
                 log.write('    critical error in test {0}, exception [{1}]\n'.format(shortname, e.message))
                 log.write('    cannot continue, aborting test suite')
+                failures.append((shortname, e, ))
                 break
             except TpsError, e:
                 print 'test [%s]: error, continuing: [%s]' % (shortname, e)
                 log.write('    error in test {0}, exception [{1}]\n'.format(shortname, e))
+                failures.append((shortname, e, ))
             except TpsUser, e:
                 print 'test [%s]: user error, user intervention required: [%s]' % (shortname, e)
                 log.write('    error in test {0}, exception [{1}]\n'.format(shortname, e))
+                failures.append((shortname, e, ))
                 while True:
                     ans = raw_input('Abort or Continue? (A/C) ')
                     ans = ans.lower()
@@ -198,8 +200,19 @@ class Suite(object):
             except TpsWarning, e:
                 print 'test [%s]: warning: [%s]' % (shortname, e.message)
                 log.write('    warning in test {0}, exception [{1}]\n'.format(shortname, e.message))
+                failures.append((shortname, e, ))
             else:
                 log.write('    OK\n')
+
+        log.write('\n')
+        log.write('------------------------\n')
+        log.write('Test suite finished.\n')
+        if not failures:
+            log.write('All tests OK\n')
+        else:
+            log.write('FAILED: ')
+            for fail in failures:
+                log.write(fail[0] + ' ')
         log.close()
 
 def get_serial():
