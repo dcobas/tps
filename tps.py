@@ -13,7 +13,7 @@ import warnings
 
 from ConfigParser import ConfigParser
 from optparse import OptionParser
-from hashlib import sha1 as sha160
+from sha import sha as sha160
 from tpsexcept import *
 
 default_config_file  = 'tpsdefault.cfg'
@@ -27,12 +27,11 @@ def run_test(testname, logname):
     """
     try:
         tmpout = sys.stdout
-        with open(logname, 'w') as sys.stdout:
-            mod = __import__(testname, globals(), locals(), [])
-            mod.main()
-    except:
-        raise
+        sys.stdout = open(logname, 'w')
+        mod = __import__(testname, globals(), locals(), [])
+        mod.main()
     finally:
+        sys.stdout.close()
         sys.stdout = tmpout
 
 class Suite(object):
@@ -84,8 +83,9 @@ class Suite(object):
         config.set('global', 'log_pattern', self.log_pattern)
 
         # Writing our configuration file
-        with open(self.config, 'wb') as configfile:
-            config.write(configfile)
+        configfile = open(self.config, 'wb')
+        config.write(configfile)
+        configfile.close()
 
     def validate_and_compute_run(self):
         """validate run paramenters"""
@@ -200,8 +200,6 @@ class Suite(object):
                 log.write('    warning in test {0}, exception [{1}]\n'.format(shortname, e.message))
             else:
                 log.write('    OK\n')
-            finally:
-                pass
         log.close()
 
 def get_serial():
