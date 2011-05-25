@@ -67,6 +67,9 @@ class Suite(object):
         self.serial       =  config.get('global', 'serial')
         self.test_path    =  config.get('global', 'test_path')
         self.log_path     =  config.get('global', 'log_path')
+        self.sequence     =  config.get('global', 'sequence')
+        self.repeat       =  config.get('global', 'repeat')
+        self.randomize    =  config.get('global', 'randomize')
 
     def save(self):
         config = ConfigParser()
