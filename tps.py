@@ -179,11 +179,11 @@ class Suite(object):
                 log.write('    cannot continue, aborting test suite')
                 break
             except TpsError, e:
-                print 'test [%s]: error, continuing: [%s]' % (shortname, e.message)
-                log.write('    error in test {0}, exception [{1}]\n'.format(shortname, e.message))
+                print 'test [%s]: error, continuing: [%s]' % (shortname, e)
+                log.write('    error in test {0}, exception [{1}]\n'.format(shortname, e))
             except TpsUser, e:
-                print 'test [%s]: user error, user intervention required: [%s]' % (shortname, e.message)
-                log.write('    error in test {0}, exception [{1}]\n'.format(shortname, e.message))
+                print 'test [%s]: user error, user intervention required: [%s]' % (shortname, e)
+                log.write('    error in test {0}, exception [{1}]\n'.format(shortname, e))
                 while True:
                     ans = raw_input('Abort or Continue? (A/C) ')
                     ans = ans.lower()
