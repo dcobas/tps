@@ -9,6 +9,7 @@ import os, os.path
 import stat
 import datetime
 import random
+import warnings
 
 from ConfigParser import ConfigParser
 from optparse import OptionParser
@@ -96,6 +97,7 @@ class Suite(object):
             msg = 'invalid serial number [{0}]'.format(self.serial)
             raise TpsInvalid(msg)
 
+        warnings.simplefilter('error')
         try:
             tmp = os.tempnam(self.test_path)
             open(tmp, 'w')
