@@ -17,8 +17,8 @@ from sha import sha as sha160
 from tpsexcept import *
 
 default_config_file  = 'tpsdefault.cfg'
-default_log_pattern  = 'tps_%(board)s_%(serial)s_%(number)s_%(timestamp)s.txt'
-default_log_name     = 'tps_run_{0}_{1}_{2}_{3}.txt'
+default_log_pattern  = 'tps_tst_{runid}_{timestamp}_{board}_{serial}_{number}.txt'
+default_log_name     = 'tps_run_{runid}_{timestamp}_{board}_{serial}.txt'
 default_test_pattern = r'test[0-9][0-9]'
 default_test_syntax  = r'(test)?(\d\d)'
 
@@ -150,7 +150,10 @@ class Suite(object):
         sequence = self.validate_and_compute_run()
         ts          = timestamp()
         runid       = sha(self.board + ':' + self.serial + ':' + ts)
-        logfilename = self.log_name.format(self.board, self.serial, ts, runid)
+        logfilename = self.log_name.format(board=self.board,
+                                serial=self.serial,
+                                timestamp=ts,
+                                runid=runid)
         logfilename = os.path.join(self.log_path, logfilename)
         log         = file(logfilename, 'wb')
 
@@ -168,8 +171,10 @@ class Suite(object):
             try:
                 testname = os.path.splitext(os.path.basename(test))[0]
                 shortname= re.match('test(\d\d)', testname).group(1)
-                logname  = self.log_pattern % dict(board=self.board,
-                                serial=self.serial, timestamp=ts,
+                logname  = self.log_pattern.format(board=self.board,
+                                serial=self.serial,
+                                timestamp=timestamp(),
+                                runid = runid,
                                 number=shortname)
                 logname  = os.path.join(self.log_path, logname)
                 log.write('------------------------\n')
