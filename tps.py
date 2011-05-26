@@ -176,8 +176,8 @@ class Suite(object):
                 log.write('running test {0} = {1}\n'.format(shortname, test))
                 run_test(testname, logname)
             except TpsCritical, e:
-                print 'test [%s]: critical error, aborting: [%s]' % (shortname, e.message)
-                log.write('    critical error in test {0}, exception [{1}]\n'.format(shortname, e.message))
+                print 'test [%s]: critical error, aborting: [%s]' % (shortname, e)
+                log.write('    critical error in test {0}, exception [{1}]\n'.format(shortname, e))
                 log.write('    cannot continue, aborting test suite')
                 failures.append((shortname, e, ))
                 break
@@ -201,8 +201,8 @@ class Suite(object):
                     log.write('    user intervention: continue\n')
                     continue
             except TpsWarning, e:
-                print 'test [%s]: warning: [%s]' % (shortname, e.message)
-                log.write('    warning in test {0}, exception [{1}]\n'.format(shortname, e.message))
+                print 'test [%s]: warning: [%s]' % (shortname, e)
+                log.write('    warning in test {0}, exception [{1}]\n'.format(shortname, e))
                 failures.append((shortname, e, ))
             else:
                 log.write('    OK\n')
@@ -371,7 +371,7 @@ def main():
     try:
         s.validate_and_compute_run()
     except TpsInvalid, e:
-        print 'bad parameters:', e.message
+        print 'bad parameters:', e
         return
 
     # decide what to do
