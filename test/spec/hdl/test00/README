@@ -1,0 +1,18 @@
+-------------------------------------------------------------------------------
+--------------------------------    TEST 1    ---------------------------------
+-------------------------------------------------------------------------------
+
+1.- WHAT IS INCLUDED
+
+  A.- A top VHDL in which 3 wishbone slaves can be addressed. Only the first
+      two are used. This two wishbone slaves correspond to the I2C master that
+      connect to i2c devices in fmc-carrier-tester: I2C_A, I2C_B.
+      Its wishbone mappings are
+        - I2C_A: 0x40000
+        - I2C_B: 0x80000
+  B.- "test00.bin" which is the bitstream for programming spec FPGA with the
+      aforementioned configuration.
+  C.- "test00.py" that it's a python test which is an aggregate of the rest
+      of python code.
+
+This test checks the voltage values of the power supply pins on the FMC.
