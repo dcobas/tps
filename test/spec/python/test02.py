@@ -285,33 +285,28 @@ class EEPROM_GENNUM:
             else :
                 raise TpsUser('EEPROM= %.2X, FILE= %.2X => ERROR' %(eeprom_data[i],file_data[i]))
 
-def  main (): 
-    bitstream_name = 'test_ddr.bin'
-    os.system('/user/siglesia/vhdl/gennum/fpga_loader/gnurabbit/user/fpga_loader_test /user/siglesia/vhdl/gennum/fpga_loader/gnurabbit/user/'+bitstream_name);
-    time.sleep(1);
-    
+def main (default_directory='.'):
+
+    path_fpga_loader = '../firmwares/fpga_loader';
+    path_firmware = '../firmwares/test02.bin';
+    	
+    firmware_loader = os.path.join(default_directory, path_fpga_loader)
+    bitstream = os.path.join(default_directory, path_firmware)
+    os.system( firmware_loader + ' ' + bitstream)
+
+    time.sleep(2);
+
     gennum = rr.Gennum();
     eeprom = EEPROM_GENNUM(gennum);
-#    eeprom.eeprom_dump_to_screen();
-    eeprom.eeprom_dump_to_file("/tmp/eeprom.dat"); # 
+    eeprom.eeprom_dump_to_file("/tmp/eeprom.dat"); 
 
-    # f_test = open("/tmp/eeprom_test.dat","w+");
-    # with open("/tmp/eeprom.dat") as f:
-    #     for line in f:
-    #         f_test.write(line);
-            
-
-    # f.close();
-
-    # f_test.seek(-14, os.SEEK_END);
-    # f_test.write("FFFF FFFFFFFF");
-    # f_test.close();
-
-    eeprom.file_dump_to_eeprom("test/eeprom_test_A.dat");
+    eeprom.file_dump_to_eeprom(default_directory+"/eeprom_test_A.dat");
     eeprom.eeprom_dump_to_screen();
-    eeprom.compare_eeprom_with_file("test/eeprom_test_A.dat");
+    eeprom.compare_eeprom_with_file(default_directory +"/eeprom_test_A.dat");
 
     eeprom.file_dump_to_eeprom("/tmp/eeprom.dat");
     eeprom.eeprom_dump_to_screen();
     eeprom.compare_eeprom_with_file("/tmp/eeprom.dat");
 
+if __name__ == '__main__' :
+	main();

@@ -13,17 +13,18 @@ class CGennumFlash :
     	GENNUM_FPGA = 2;
     	FPGA_FLASH = 3; 
 
-	def __init__ (self, bus):
+	def __init__ (self, bus, path):
         	self.bus = bus;
-	        self.lib = cdll.LoadLibrary("libfpga_loader.so");
+		library = path + "libfpga_loader.so";
+	        self.lib = cdll.LoadLibrary(library);
         	self.lib.rr_init();
 	        self.lib.gpio_init();
 
 
-def main():
+def main (default_directory='.'):
 
     gennum = rr.Gennum();
-    flash = CGennumFlash(gennum);
+    flash = CGennumFlash(gennum, default_directory);
 
     start = time.time();
     flash.lib.gpio_bootselect(flash.GENNUM_FLASH);
@@ -33,7 +34,7 @@ def main():
     
     # Load a new firmware to the Flash memory.
     print "Starting the process to load a FW into Flash memory"
-    flash.lib.load_mcs_to_flash("./test_flash.bin");
+    flash.lib.load_mcs_to_flash(default_directory + "/test_flash.bin");
 
     time.sleep(1);
     print "Forcing to load FW from Flash memory to FPGA"
@@ -59,10 +60,5 @@ def main():
     if (ask == "N") :
 	raise TpsError("Error loading FW through the Flash memory");
 
-
-    
-        
-            
-        
-                
-    
+if __name__ == '__main__' :
+	main();

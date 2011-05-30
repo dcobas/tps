@@ -320,7 +320,16 @@ class AD5662_1:
         self.spi.transaction(0, data)     
 
 
-def main():
+def main (default_directory='.'):
+
+    path_fpga_loader = '../firmwares/fpga_loader';
+    path_firmware = '../firmwares/test08.bin';
+    	
+    firmware_loader = os.path.join(default_directory, path_fpga_loader)
+    bitstream = os.path.join(default_directory, path_firmware)
+    os.system( firmware_loader + ' ' + bitstream)
+
+    time.sleep(2);
 
     global double_counter
 

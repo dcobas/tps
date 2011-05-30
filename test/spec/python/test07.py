@@ -13,12 +13,17 @@ import os
 
 GN4124_CSR = 0x0
 
-def main():
+	
+def main (default_directory='.'):
 
-    bitstream_name = 'test_ddr.bin'
-    os.system('/user/siglesia/vhdl/gennum/fpga_loader/gnurabbit/user/fpga_loader_test /user/siglesia/vhdl/gennum/fpga_loader/gnurabbit/user/'+bitstream_name);
-    time.sleep(1);
+    path_fpga_loader = '../firmwares/fpga_loader';
+    path_firmware = '../firmwares/test07.bin';
+    	
+    firmware_loader = os.path.join(default_directory, path_fpga_loader)
+    bitstream = os.path.join(default_directory, path_firmware)
+    os.system( firmware_loader + ' ' + bitstream)
 
+    time.sleep(2);
 
     # Objects declaration
     spec = rr.Gennum() # bind to the SPEC board
@@ -116,3 +121,7 @@ def main():
     t2 = time.time();
     print 'End of test'
     print 'Time DDR test: ' + str(t2-t1) + ' seconds'
+
+
+if __name__ == '__main__' :
+	main();

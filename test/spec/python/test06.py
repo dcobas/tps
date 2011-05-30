@@ -149,10 +149,17 @@ class CSI570 :
 		val = (1 << 7);
 		self.wr_reg8(self.RST_MEM_CTRL, val);
 
-def main ():
-    bitstream_name = 'test_si570.bin'
-    os.system('/user/siglesia/vhdl/gennum/fpga_loader/gnurabbit/user/fpga_loader_test /user/siglesia/vhdl/gennum/fpga_loader/gnurabbit/user/'+bitstream_name);
-    time.sleep(1);
+	
+def main (default_directory='.'):
+
+    path_fpga_loader = '../firmwares/fpga_loader';
+    path_firmware = '../firmwares/test06.bin';
+    	
+    firmware_loader = os.path.join(default_directory, path_fpga_loader)
+    bitstream = os.path.join(default_directory, path_firmware)
+    os.system( firmware_loader + ' ' + bitstream)
+
+    time.sleep(2);
 
     gennum = rr.Gennum();
 
@@ -170,3 +177,6 @@ def main ():
     else :
 	raise TpsError("SIS570 CLK present: FAILED")
 
+
+if __name__ == '__main__' :
+	main();
