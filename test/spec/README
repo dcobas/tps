@@ -1,0 +1,28 @@
+*******************************************************************************
+
+		      SPEC's tests for TPS environment
+
+*******************************************************************************
+CERN, BE/CO/HT. Created on 2011
+
+Author: Carlos Gil Soriano <cgilsori@cern.ch>
+Author: Samuel Iglesias Gonsalvez <siglesia@cern.ch>
+Licence: GPL v2 or later.
+Website: http://www.ohwr.org
+
+This batch of test makes a connectivity test of the SPEC's components.
+
+	- test00: checks voltage of the power pins in FMC connector.
+	- test01: checks the low speed pins of FMC connector (low count connector).
+	- test02: checks the EEPROM of the GENNUM chip. 
+	- test03: loads a firmware file to Flash memory and boots from it. The FW just blink the leds.
+	- test04: not present now. It should be SFP connectivity test.
+	- test05: check SATA ports and high speed pins on FMC connector (low count connector).
+	- test06: check Silabs SI570 oscillator.
+	- test07: check data and address lines of DDR memory.
+	- test08: check PLL and rest of oscillators on SPEC board.
+
+This tests are made to work stand-alone too. So, it is possible to call each one using 'python test0x.py'
+
+These tests are designed to use Python 2.7 or higher. 
+
