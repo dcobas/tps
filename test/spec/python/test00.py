@@ -128,11 +128,16 @@ class ADC_AD7997:
 def adc_value(value) :
 	return str(2.495 * (0x3FF & (value >> 2)) / 1024); # 10 bits
 	
-def 	main ():
+def main (default_directory='.'):
 
-    	bitstream_name = 'test_voltage_fmc.bin'
-    	os.system('/user/siglesia/vhdl/gennum/fpga_loader/gnurabbit/user/fpga_loader_test /user/siglesia/vhdl/gennum/fpga_loader/gnurabbit/user/'+bitstream_name);
-    	time.sleep(1);
+	path_fpga_loader = '../firmwares/fpga_loader';
+	path_firmware = '../firmwares/test00.bin';
+    	
+	firmware_loader = os.path.join(default_directory, path_fpga_loader)
+    	bitstream = os.path.join(default_directory, path_firmware)
+    	os.system( firmware_loader + ' ' + bitstream)
+
+    	time.sleep(2);
     
 	gennum = rr.Gennum();
 
@@ -183,5 +188,6 @@ def 	main ():
 		raise TpsWarning( "Error in P12V_BI, value " + value1 + " < 2.0")
 	print "P12V_BI = " + value1
 
-
+if __name__ == '__main__' :
+	main();
 
