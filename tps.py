@@ -386,9 +386,7 @@ def main():
     # decide what to do
     if options.write_config:
         s.save()
-        return
-
-    if options.cli:
+    elif options.cli:
         s.cmdloop()
     else:
         s.run()
