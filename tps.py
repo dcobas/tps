@@ -11,7 +11,7 @@ import datetime
 import random
 import warnings
 
-from ConfigParser import ConfigParser
+from ConfigParser import ConfigParser, NoOptionError
 from optparse import OptionParser
 from sha import sha as sha160
 from tpsexcept import *
@@ -44,6 +44,7 @@ class Suite(object):
         self.config       =  default_config_file
         self.log_pattern  =  default_log_pattern
         self.log_name     =  default_log_name
+        self.read_config(self.config)
 
     def missing(self):
         """report missing fields before suite run"""
@@ -63,13 +64,16 @@ class Suite(object):
             raise TpsCritical(errmsg)
         config = ConfigParser(cfg)
 
-        self.board        =  config.get('global', 'board')
-        self.serial       =  config.get('global', 'serial')
-        self.test_path    =  config.get('global', 'test_path')
-        self.log_path     =  config.get('global', 'log_path')
-        self.sequence     =  config.get('global', 'sequence')
-        self.repeat       =  config.get('global', 'repeat')
-        self.randomize    =  config.get('global', 'randomize')
+        try:
+            self.board        =  config.get('global', 'board')
+            self.serial       =  config.get('global', 'serial')
+            self.test_path    =  config.get('global', 'test_path')
+            self.log_path     =  config.get('global', 'log_path')
+            self.sequence     =  config.get('global', 'sequence')
+            self.repeat       =  config.get('global', 'repeat')
+            self.randomize    =  config.get('global', 'randomize')
+        except NoOptionError:
+            pass
 
     def save(self):
         config = ConfigParser()
