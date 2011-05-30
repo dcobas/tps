@@ -80,8 +80,8 @@ def main():
         for j in range(num_addr_lines):
 	    page_data[j] = gennum.get_memory_page(3+j)
 	    if (j == i) :
-		if (page_data[j][0] != 0xDEADFACE):
-                    print("\n### Compare error @ addr line:0x%.8X wr:0x%.8X rd:0x%.8X") % (j,0xDEADFACE, page_data[j][0])
+		if (page_data[j][0] != 0xBABEFACE):
+                    print("\n### Compare error @ addr line:0x%.8X wr:0x%.8X rd:0x%.8X") % (j,0xBABEFACE, page_data[j][0])
                     error = 1;
             else :
                 if(page_data[j][0] != 0x0):
