@@ -14,12 +14,7 @@ This tests checks the 20 MHz system clock and the output of the CDC5662 PLL
 """
 
 # jdgc: path dependencies
-firmware_loader_path = 'tests/fpga_loader_test '
 test_clk_path = './log/test_clk/'  # jdgc
-clk_test_bitstream = 'tests/test_clk.bin' 
-# test_clk_path = '/tmp'
-# firmware_loader_path = 'fpga_loader_test '
-# clk_test_bitstream = 'test_clk.bin' 
 
 TEST_TIME_SLOW = 0.25
 TOTAL_OF_TESTS = 10
@@ -332,10 +327,6 @@ def main (default_directory='.'):
     time.sleep(2);
 
     global double_counter
-
-    bitstream_name = clk_test_bitstream
-    os.system(firmware_loader_path + ' ' + bitstream_name);
-    time.sleep(2);     # Take it easy yo'! Reducing this time can produce unexpected outputs
 
     gennum = rr.Gennum();
     double_counter = WB_2CLK_COUNTER(gennum, BASE_WB_2CLK_COUNTER)

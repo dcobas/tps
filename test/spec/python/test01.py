@@ -8,6 +8,7 @@ import errno
 
 from tpsexcept import *		# jdgc
 
+tests_path = '.'
 default_log_path = '.'
 
 # Mapping for seven slaves!
@@ -36,8 +37,6 @@ FMC_SPEC_ROLL_1_TEST_ID_CC_gpio_to_i2c_96bits = 0x0D
 FMC_SPEC_ROLL_0_TEST_ID_CC_i2c_to_gpio_96bits = 0x0E
 FMC_SPEC_ROLL_1_TEST_ID_CC_i2c_to_gpio_96bits = 0x0F
 
-groundShorts  = []
-vsupplyShorts = []
 testStatus = {}
 
 gpio_0_to_tester = ['LA17N', 'LA19N', 'LA19P', 'LA20P', 'LA20N', 'LA14N', 'LA14P', 'LA17P', 'LA13N', 'LA13P', 'LA15P', 'LA15N', 'LA16P', 'LA32N', 'LA33P', 'LA33N', 'LA7P', 'LA5P', 'LA7N', 'LA8N', 'LA8P', 'LA6N', 'LA12P', 'LA9N', 'LA16N', 'LA12N', 'LA11P', 'LA10N', 'LA11N', 'LA10P', 'LA9P', 'LA5N']
@@ -395,7 +394,6 @@ def FMC_roll_test_CC_16bits(i2c_block, i2c_block_mask, gpio_block, gpio_block_ma
         i2c_block.set_input(EXPANDER_MCP23017.GPIOB, 0xFF)
         expected = expected & gpio_block_mask
         gpio_block.wr_GPIO_block(expected)
-        #print "Reading Back\t" + hex(gpio_block.rd_GPIO_block() & gpio_block_mask)       # If we read back it appears errors (?!¿??¿?!) Maybe is because low cap
         rcv_byte1 = i2c_block.rd_reg8(EXPANDER_MCP23017.GPIOA)
         rcv_byte0 = i2c_block.rd_reg8(EXPANDER_MCP23017.GPIOB)
         received = 0
@@ -430,7 +428,7 @@ def FMC_roll_test_CC_16bits(i2c_block, i2c_block_mask, gpio_block, gpio_block_ma
     print "Expected:\t" + "Received:\t" + "Mask\t\t" + "Info\t"
     gpio_block.set_GPIO_inout(0xFFFFFFFF) 
 #    print "Vector\t\tShortcircuit"
-    global groundShorts, vsupplyShorts
+#    global groundShorts, vsupplyShorts
     groundShorts = []
     vsupplyShorts = []
 
@@ -450,7 +448,6 @@ def FMC_roll_test_CC_16bits(i2c_block, i2c_block_mask, gpio_block, gpio_block_ma
         i2c_block.set_input(EXPANDER_MCP23017.GPIOB, 0xFF)
         expected = expected & gpio_block_mask
         gpio_block.wr_GPIO_block(expected)
-        #print "Reading Back\t" + hex(gpio_block.rd_GPIO_block() & gpio_block_mask)       # If we read back it appears errors (?!¿??¿?!) Maybe is because low cap
         rcv_byte1 = i2c_block.rd_reg8(EXPANDER_MCP23017.GPIOA)
         rcv_byte0 = i2c_block.rd_reg8(EXPANDER_MCP23017.GPIOB)
         received = 0
@@ -522,7 +519,6 @@ def FMC_roll_test_CC(i2c_block_upper, i2c_block_upper_mask, i2c_block_lower, i2c
         i2c_block_lower.set_input(EXPANDER_MCP23017.GPIOA, 0xFF)
         i2c_block_lower.set_input(EXPANDER_MCP23017.GPIOB, 0xFF)
         gpio_block.wr_GPIO_block(expected & gpio_block_mask)
-        #print "Reading Back\t" + hex(gpio_block.rd_GPIO_block() & gpio_block_mask)       # If we read back it appears errors (?!¿??¿?!) Maybe is because low cap
         rcv_byte3 = i2c_block_upper.rd_reg8(EXPANDER_MCP23017.GPIOA)
         rcv_byte2 = i2c_block_upper.rd_reg8(EXPANDER_MCP23017.GPIOB)
         rcv_byte1 = i2c_block_lower.rd_reg8(EXPANDER_MCP23017.GPIOA)
@@ -592,7 +588,7 @@ def FMC_roll_test_CC(i2c_block_upper, i2c_block_upper_mask, i2c_block_lower, i2c
     print "Expected:\t" + "Received:\t" + "Mask\t\t" + "Info\t"
     gpio_block.set_GPIO_inout(0xFFFFFFFF) 
 #    print "Vector\t\tShortcircuit"
-    global groundShorts, vsupplyShorts
+#    global groundShorts, vsupplyShorts
     groundShorts = []
     vsupplyShorts = []
 
@@ -717,7 +713,7 @@ def FMC_roll_test_CC_16bits_i2c_writing(i2c_block, i2c_block_mask, gpio_block, g
     print "- Additional\tgpio_block_mask:\t" + hex(gpio_block_mask)
     print "Expected:\t" + "Received:\t" + "Mask\t\t" + "Info\t"
 #    print "Vector\t\tShortcircuit"
-    global groundShorts, vsupplyShorts
+#    global groundShorts, vsupplyShorts
     groundShorts = []
     vsupplyShorts = []
 
@@ -868,7 +864,7 @@ def FMC_roll_test_CC_i2c_writing(i2c_block_upper, i2c_block_upper_mask, i2c_bloc
     print "Expected:\t" + "Received:\t" + "Mask\t\t" + "Info\t"
 
 #    print "Vector\t\tShortcircuit"
-    global groundShorts, vsupplyShorts
+#    global groundShorts, vsupplyShorts
     groundShorts = []
     vsupplyShorts = []
 
@@ -1103,7 +1099,7 @@ def summary_results(testStatus):
 
     filename = "Summary_FMC_tets.txt"
 
-    file = open(os.path.join(loopback_log, filename)), 'w')
+    file = open(os.path.join(loopback_log, filename), 'w')
     file.write(string)
     
 
@@ -1141,7 +1137,7 @@ def write_test_results(gpio_bank_list, i2c_list, test_id, bits_tested, offset):
 
 # This file generation must be revised !!!
 # yes indeed!!! jdgc
-    gpio_pinout = os.path.join(default_directory, './log/test_fmc/loopback/GPIO_pinout/')
+    gpio_pinout = os.path.join(tests_path, './log/test_fmc/loopback/GPIO_pinout/')
     mkdir_p(gpio_pinout)
     file = open(os.path.join(gpio_pinout, filename), 'w')
     file.write('DEVICE_ID:\t'+filename[:-7].replace('GPIO_', 'GPIO').replace('_',' ')+'\n')
@@ -1162,7 +1158,8 @@ def write_test_results(gpio_bank_list, i2c_list, test_id, bits_tested, offset):
                 file.write(str(i)+'\t\tOK'+'\n')
     file.close()
 
-    tester_pinout = os.path.join(default_directory, './log/test_fmc/loopback/tester_pinout/')
+    tester_pinout = os.path.join(tests_path, './log/test_fmc/loopback/tester_pinout/')
+    mkdir_p(tester_pinout)
     file = open(os.path.join(tester_pinout, filename), 'w')
     file.write('DEVICE_ID:\t'+filename[:-7].replace('GPIO_', 'GPIO').replace('_',' ')+'\n')
     file.write('TEST_ID:\t'+"%.2X"%test_id+'\n')
@@ -1234,8 +1231,9 @@ def write_test_results(gpio_bank_list, i2c_list, test_id, bits_tested, offset):
 
 def main (default_directory='.', default_log='.'):
 
-    global default_log_path = default_log
-
+    global default_log_path, tests_path
+    tests_path = default_directory
+    default_log_path = default_log
     path_fpga_loader = '../firmwares/fpga_loader';
     path_firmware = '../firmwares/test01.bin';
     	
@@ -1247,11 +1245,6 @@ def main (default_directory='.', default_log='.'):
  
     gennum = rr.Gennum();
  
-    bitstream_name = clk_test_bitstream
-    os.system(firmware_loader_path + ' ' + bitstream_name);
-    time.sleep(2);     # Take it easy yo'! Reducing this time can produce unexpected outputs
-
-   
    
     GPIO_BLOCK_0_MASK = 0xFFFFFFFF     # Take care! Here 1 means write into the pad
     GPIO_BLOCK_1_MASK = 0xBB1BFBFF
@@ -1304,5 +1297,7 @@ def main (default_directory='.', default_log='.'):
 
     summary_results(testStatus)
 
+groundShorts  = []
+vsupplyShorts = []
 if __name__ == '__main__':
 	main(default_directory='.', default_log='.')

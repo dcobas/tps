@@ -1,6 +1,8 @@
-#!   /usr/bin/env   python
+#!/acc/src/dsc/drivers/cohtdrep/siglesia/Python-2.7/python
 #    coding: utf8
 
+
+##!   /usr/bin/env   python
 import sys
 import cmd
 import glob
@@ -29,7 +31,7 @@ def run_test(testname, logname):
         tmpout = sys.stdout
         sys.stdout = open(logname, 'w')
         mod = __import__(testname, globals(), locals(), [])
-        mod.main()
+        mod.main(default_directory='./test/spec/python')
     finally:
         sys.stdout.close()
         sys.stdout = tmpout
@@ -44,7 +46,7 @@ class Suite(object):
         self.config       =  default_config_file
         self.log_pattern  =  default_log_pattern
         self.log_name     =  default_log_name
-        self.read_config(self.config)
+        #self.read_config(self.config)
 
     def missing(self):
         """report missing fields before suite run"""
@@ -54,6 +56,7 @@ class Suite(object):
         return missing
 
     def read_config(self, name=None):
+	print "SIG: name: " + name
         if name:
             self.config = name
         try:
@@ -62,6 +65,7 @@ class Suite(object):
             errmsg = 'could not read configuration file {0}'
             errmsg = errmsg.format(self.config)
             raise TpsCritical(errmsg)
+	#print "SIG: cfg: " + cfg
         config = ConfigParser(cfg)
 
         try:
@@ -101,6 +105,7 @@ class Suite(object):
         if not self.serial:
             msg = 'invalid serial number [{0}]'.format(self.serial)
             raise TpsInvalid(msg)
+	self.serial = self.serial.strip(',')
 
         warnings.simplefilter('error')
         try:

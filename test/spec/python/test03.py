@@ -5,6 +5,7 @@ import sys
 import rr
 import time
 import os
+import os.path
 from ctypes import *
 from tpsexcept import *
 
@@ -15,7 +16,7 @@ class CGennumFlash :
 
 	def __init__ (self, bus, path):
         	self.bus = bus;
-		library = path + "libfpga_loader.so";
+		library = os.path.join(path,"libfpga_loader.so");
 	        self.lib = cdll.LoadLibrary(library);
         	self.lib.rr_init();
 	        self.lib.gpio_init();
