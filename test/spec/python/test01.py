@@ -4,7 +4,11 @@ import sys
 import rr
 import time
 import os
+import errno
+
 from tpsexcept import *		# jdgc
+
+default_log_path = '.'
 
 # Mapping for seven slaves!
 BASE_I2C_B = 0x20000
@@ -340,6 +344,16 @@ class GPIO_slave:
             self.bus.iwrite(0, self.base +  self.R_GPIO_DIR, 4, mask)  # According to IOBUF spec, 0 means write into the pad
             value = self.bus.iread(0, self.base +  self.R_GPIO_IOBUF, 4)
             return (value & mask)
+
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST:
+            pass
+        else:
+            raise
 
 def FMC_roll_test_CC_16bits(i2c_block, i2c_block_mask, gpio_block, gpio_block_mask, offset, device) :
     print "----------------------------------------"
@@ -1071,12 +1085,9 @@ def show_test_results(gpio_bank, bits_tested, offset, groundShorts, vsupplyShort
         print "---- Vcc tied pins:\t" + vsupplyShorts_string
 
 def summary_results(testStatus):
-    if not os.path.exists('./log/'):
-        os.mkdir('./log')
-    if not os.path.exists('./log/test_fmc/'):
-        os.mkdir('./log/test_fmc')
-    if not os.path.exists('./log/test_fmc/loopback/'):
-        os.mkdir('./log/test_fmc/loopback')
+
+    loopback_log = os.path.join(default_log_path, './log/test_fmc/loopback/')
+    mkdir_p(loopback_log)
 
     string = ''
 
@@ -1092,24 +1103,14 @@ def summary_results(testStatus):
 
     filename = "Summary_FMC_tets.txt"
 
-    file = open('./log/test_fmc/loopback/'+filename, 'w')
+    file = open(os.path.join(loopback_log, filename)), 'w')
     file.write(string)
     
 
 def write_test_results(gpio_bank_list, i2c_list, test_id, bits_tested, offset):
     # We store data in log subfolder
-    if not os.path.exists('./log/'):
-        os.mkdir('./log')
-    if not os.path.exists('./log/test_fmc/'):
-        os.mkdir('./log/test_fmc')
-    if not os.path.exists('./log/test_fmc/loopback/'):
-        os.mkdir('./log/test_fmc/loopback')
-    if not os.path.exists('./log/test_fmc/loopback/GPIO_pinout/'):
-        os.mkdir('./log/test_fmc/loopback/GPIO_pinout')
-    if not os.path.exists('./log/test_fmc/loopback/tester_pinout/'):
-        os.mkdir('./log/test_fmc/loopback/tester_pinout')
-    if not os.path.exists('./log/test_fmc/loopback/FMC_pinout/'):
-        os.mkdir('./log/test_fmc/loopback/FMC_pinout')
+    fmc_pinout_log = os.path.join(default_log_path, './log/test_fmc/loopback/FMC_pinout')
+    mkdir_p(fmc_pinout_log)
 
     if (offset == 0):
         if (bits_tested != 16 | bits_tested != 32 | bits_tested != 64 | bits_tested != 96 ):
@@ -1139,8 +1140,10 @@ def write_test_results(gpio_bank_list, i2c_list, test_id, bits_tested, offset):
     filename += '_' + "%.2X"%test_id+'.txt' 
 
 # This file generation must be revised !!!
-
-    file = open('./log/test_fmc/loopback/GPIO_pinout/'+filename, 'w')
+# yes indeed!!! jdgc
+    gpio_pinout = os.path.join(default_directory, './log/test_fmc/loopback/GPIO_pinout/')
+    mkdir_p(gpio_pinout)
+    file = open(os.path.join(gpio_pinout, filename), 'w')
     file.write('DEVICE_ID:\t'+filename[:-7].replace('GPIO_', 'GPIO').replace('_',' ')+'\n')
     file.write('TEST_ID:\t'+"%.2X"%test_id+'\n')
     file.write('OUTPUT_MODE:\t'+'GPIO pinout'+'\n')
@@ -1159,7 +1162,8 @@ def write_test_results(gpio_bank_list, i2c_list, test_id, bits_tested, offset):
                 file.write(str(i)+'\t\tOK'+'\n')
     file.close()
 
-    file = open('./log/test_fmc/loopback/tester_pinout/'+filename, 'w')
+    tester_pinout = os.path.join(default_directory, './log/test_fmc/loopback/tester_pinout/')
+    file = open(os.path.join(tester_pinout, filename), 'w')
     file.write('DEVICE_ID:\t'+filename[:-7].replace('GPIO_', 'GPIO').replace('_',' ')+'\n')
     file.write('TEST_ID:\t'+"%.2X"%test_id+'\n')
     file.write('OUTPUT_MODE:\t'+'Tester pinout'+'\n')
@@ -1206,7 +1210,7 @@ def write_test_results(gpio_bank_list, i2c_list, test_id, bits_tested, offset):
         else:
             raise Exception("Bad 'gpio_block_name_list'")
 
-    file = open('./log/test_fmc/loopback/FMC_pinout/'+filename, 'w')
+    file = open(os.path.join(fmc_pinout_log, filename), 'w')
     file.write('DEVICE_ID:\t'+filename[:-7].replace('GPIO_', 'GPIO').replace('_',' ')+'\n')
     file.write('TEST_ID:\t'+"%.2X"%test_id+'\n')
     file.write('OUTPUT_MODE:\t'+'FMC pinout'+'\n')
@@ -1228,7 +1232,10 @@ def write_test_results(gpio_bank_list, i2c_list, test_id, bits_tested, offset):
         file.write(k +'\t\t'+translation_dict[k]+'\n')
     file.close()
 
-def main (default_directory='.'):
+def main (default_directory='.', default_log='.'):
+
+    global default_log_path = default_log
+
     path_fpga_loader = '../firmwares/fpga_loader';
     path_firmware = '../firmwares/test01.bin';
     	
@@ -1298,4 +1305,4 @@ def main (default_directory='.'):
     summary_results(testStatus)
 
 if __name__ == '__main__':
-	main()
+	main(default_directory='.', default_log='.')
