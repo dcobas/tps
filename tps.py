@@ -220,11 +220,14 @@ class Suite(object):
         log.write('------------------------\n')
         log.write('Test suite finished.\n')
         if not failures:
-            log.write('All tests OK\n')
+            msg = 'All tests OK\n'
         else:
-            log.write('FAILED: ')
+            msg = [ 'FAILED:' ]
             for fail in failures:
-                log.write(fail[0] + ' ')
+                msg.append(fail[0])
+            msg = ' '.join(msg)
+        print msg
+        log.write(msg)
         log.close()
 
 def get_serial():
