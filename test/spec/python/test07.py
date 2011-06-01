@@ -15,6 +15,8 @@ import i2c
 import gn4124
 import os
 
+from tpsexcept import *
+
 """
 test07: checks data and address lines of DDR memory.
 """
@@ -56,35 +58,39 @@ def main (default_directory='.'):
 
     # Clear memory pages
     gennum.set_memory_page(0, 0x0)
-    gennum.set_memory_page(1, 0xBABEFACE)
+    gennum.set_memory_page(1, 0xFFFFFFFF)
     gennum.set_memory_page(2, 0x0)
     dma_length = 0x400 # DMA length in bytes
 
     t1 = time.time();
 
     print "Test Address lines"
+    print "Checking if some pin is tied to GND"
     error = 0;
     for i in range(num_addr_lines) :
-	if (i==0) :
-		continue;
+
+        gennum.add_dma_item(0, pages[2], dma_length, 1, 1)
+        gennum.add_dma_item(0, pages[3], dma_length, 0, 0)
+        gennum.start_dma()
+        gennum.wait_irq()
 
 	for j in range(num_addr_lines/2) :
-            t3 = time.time();
+
             if (i != 2*j) :
                 gennum.add_dma_item((1 << 2*j), pages[2], dma_length, 1, 1)
-                gennum.add_dma_item((1 << 2*j), pages[3+2*j], dma_length, 0, 0)
+                gennum.add_dma_item((1 << 2*j), pages[4+2*j], dma_length, 0, 0)
             	gennum.start_dma()
             	gennum.wait_irq()
 
 
             if ((2*j+1) != i) :
                 gennum.add_dma_item((1 << (2*j+1)), pages[2], dma_length, 1, 1)
-                gennum.add_dma_item((1 << (2*j+1)), pages[3+(2*j+1)], dma_length, 0, 0)
+                gennum.add_dma_item((1 << (2*j+1)), pages[4+(2*j+1)], dma_length, 0, 0)
             	gennum.start_dma()
             	gennum.wait_irq()
 
         gennum.add_dma_item((1 << i), pages[1], dma_length, 1, 1)
-        gennum.add_dma_item((1 << i), pages[3+i], dma_length, 0, 0)
+        gennum.add_dma_item((1 << i), pages[4+i], dma_length, 0, 0)
         gennum.start_dma()
         gennum.wait_irq()
                                         
@@ -92,17 +98,59 @@ def main (default_directory='.'):
 	page_data = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
         for j in range(num_addr_lines):
 	    page_data[j] = gennum.get_memory_page(3+j)
-	    if (j == i) :
-		if (page_data[j][0] != 0xBABEFACE):
-                    print("\n### Compare error @ addr line:0x%.8X wr:0x%.8X rd:0x%.8X") % (j,0xBABEFACE, page_data[j][0])
+	    if (j == (i + 1)) :
+		if (page_data[j][0] != 0xFFFFFFFF):
+                    print("\n### Compare error (pin is tied to GND?) @ addr line: %d wr:0x%.8X rd:0x%.8X") % (j,0xFFFFFFFF, page_data[j][0])
                     error = 1;
             else :
                 if(page_data[j][0] != 0x0):
-                    print("\n### Compare error @ addr line:0x%.8X wr:0x%.8X rd:0x%.8X") % (j,0x0, page_data[j][0])
+                    print("\n### Compare error (pin is tied to GND?) @ addr line: %d wr:0x%.8X rd:0x%.8X") % (j,0x0, page_data[j][0])
+                    error = 1;
+    print "Checking if some pin is tied to Vcc"
+
+    addr_mask = 0xFFFFFFFFFFFFFFFF;
+    for i in range(num_addr_lines) :
+
+        gennum.add_dma_item(addr_mask, pages[2], dma_length, 1, 1)
+        gennum.add_dma_item(addr_mask, pages[3], dma_length, 0, 0)
+        gennum.start_dma()
+        gennum.wait_irq()
+
+	for j in range(num_addr_lines/2) :
+            if (i != 2*j) :
+                gennum.add_dma_item(addr_mask & (~(1 << 2*j)), pages[2], dma_length, 1, 1)
+                gennum.add_dma_item( addr_mask & (~(1 << 2*j)), pages[4+2*j], dma_length, 0, 0)
+            	gennum.start_dma()
+            	gennum.wait_irq()
+
+
+            if ((2*j+1) != i) :
+                gennum.add_dma_item(addr_mask & (~(1 << 2*j)), pages[2], dma_length, 1, 1)
+                gennum.add_dma_item(addr_mask & (~(1 << 2*j)), pages[4+(2*j+1)], dma_length, 0, 0)
+            	gennum.start_dma()
+            	gennum.wait_irq()
+
+        gennum.add_dma_item(addr_mask & (~(1 << i)), pages[1], dma_length, 1, 1)
+        gennum.add_dma_item(addr_mask & (~(1 << i)), pages[4+i], dma_length, 0, 0)
+        gennum.start_dma()
+        gennum.wait_irq()
+                                        
+
+	page_data = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        for j in range(num_addr_lines):
+	    page_data[j] = gennum.get_memory_page(3+j)
+	    if (j == (i +1)) :
+		if (page_data[j][0] != 0xFFFFFFFF):
+                    print("\n### Compare error (pin is tied to Vcc?) @ addr line:0x%.8X wr:0x%.8X rd:0x%.8X") % (j,0xFFFFFFFF, page_data[j][0])
+                    error = 1;
+            else :
+                if(page_data[j][0] != 0x0):
+                    print("\n### Compare error (pin is tied to Vcc?) @ addr line:0x%.8X wr:0x%.8X rd:0x%.8X") % (j,0x0, page_data[j][0])
                     error = 1;
 
     if (error) :
 	print "RESULT: [FAILED]"
+	raise TpsError ("Error in DDR address lines. Please check log file for more information")
     else :
 	print "RESULT: [OK]"
 
@@ -123,6 +171,7 @@ def main (default_directory='.'):
 
     if (error) :
 	print "RESULT: [FAILED]"
+	raise TpsError ("Error in DDR address lines. Please check log file for more information")
     else :
 	print "RESULT: [OK]"
 
