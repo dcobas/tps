@@ -166,18 +166,19 @@ def main (default_directory='.'):
 	value1 = adc_value(adc.rd_reg16(0x80));
 
 	# Check the values of the ADC.
-	if(float(value8) < 1.7) :
-		raise TpsError ("Error in VS_VADJ, value " + value8 + " < 1.7 V")
+	if(float(value8) < 1.61) or (float(value8) > 1.72) :
+		raise TpsError ("Error in VS_VADJ, value x=" + value8 + ". x > 1.72 V or x < 1.61 V")
 	print "VS_VADJ = " + value8
 
-	if(float(value7) < 2.0) :
-		raise TpsError ("Error in VS_P12V_x, value " + value7 + " < 2.0 V")
+	if(float(value7) < 1.90) or (float(value7) > 2.11):
+		raise TpsError ("Error in VS_P12V_x, value x=" + value7 + ". x< 1.90 V or x > 2.11 V")
 	print "VS_P12V_x = " + value7
 
-	if(float(value6) < 1.57) :
-		raise TpsError ("Error in VS_P3V3_x, value " + value6 + " < 1.57 V")
+	if(float(value6) < 1.66) or (float(value6) > 1.80):
+		raise TpsError ("Error in VS_P3V3_x, value x=" + value6 + ". x < 1.66 V or x > 1.80 V")
 	print "VS_P3V3_x = " + value6
 
+"""
 	if(float(value5) < 2.52) :
 		print "Error in P5V_BI, value " + value5 + " < 2.52 V"
 	print "P5V_BI = " + value5
@@ -197,6 +198,7 @@ def main (default_directory='.'):
 	if(float(value1) < 2.0) :
 		print "Error in P12V_BI, value " + value1 + " < 2.0 V"
 	print "P12V_BI = " + value1
+"""
 
 if __name__ == '__main__' :
 	main();
