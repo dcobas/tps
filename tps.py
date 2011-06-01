@@ -1,8 +1,7 @@
-#!/acc/src/dsc/drivers/cohtdrep/siglesia/Python-2.7/python
+#!   /usr/bin/env   python
 #    coding: utf8
 
 
-##!   /usr/bin/env   python
 import sys
 import cmd
 import glob

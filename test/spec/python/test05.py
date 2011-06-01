@@ -1,5 +1,5 @@
-#!/acc/src/dsc/drivers/cohtdrep/siglesia/Python-2.7/python
-# It needs Python 2.7 or higher!
+#!   /usr/bin/env   python
+#    coding: utf8
 
 import ctypes
 from multiprocessing import Process
