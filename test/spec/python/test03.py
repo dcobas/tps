@@ -64,6 +64,7 @@ def main (default_directory='.'):
     sys.stdin = sys.__stdin__;
     while ((ask != "Y") and (ask != "N")) :
     	ask = raw_input("Are the LEDs blinking? [Y/N]")
+	ask = ask.upper()
 
     sys.stdout = tmp_stdout;
     sys.stdin = tmp_stdin;
