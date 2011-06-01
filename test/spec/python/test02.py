@@ -1,6 +1,11 @@
 #!   /usr/bin/env   python
 #    coding: utf8
 
+# Copyright CERN, 2011
+# Author: Samuel Iglesias Gonsalvez <siglesia@cern.ch>
+# Licence: GPL v2 or later.
+# Website: http://www.ohwr.org
+
 import sys
 import rr
 import time

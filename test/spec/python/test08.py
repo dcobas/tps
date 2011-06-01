@@ -1,6 +1,11 @@
 #!   /usr/bin/env   python
 #    coding: utf8
 
+# Copyright CERN, 2011
+# Author: Carlos Gil Soriano <cgilsori@cern.ch>
+# Licence: GPL v2 or later.
+# Website: http://www.ohwr.org
+
 import sys
 import os
 import rr
