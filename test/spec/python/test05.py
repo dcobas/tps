@@ -417,7 +417,8 @@ def main (default_directory='.'):
     ask = "";
     print "\n*************************************************************"
     while ((ask != "Y") and (ask != "N")) :
-    	ask = raw_input("Please, now connect a SATA cable between FMC tester and SATA 1 connector. Is it done? [Y/N]")
+        ask = raw_input("Please, now connect a SATA cable between FMC tester and SATA 1 connector. Is it done? [Y/N]")
+        ask = ask.upper()
 
     if (ask == "N") :
 	raise TpsWarning("Test DP0-SATA 1 cancelled");
