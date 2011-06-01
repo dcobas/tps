@@ -59,7 +59,6 @@ class Suite(object):
         return missing
 
     def read_config(self, name=None):
-	print "SIG: name: " + name
         if name:
             self.config = name
         try:
@@ -68,7 +67,6 @@ class Suite(object):
             errmsg = 'could not read configuration file {0}'
             errmsg = errmsg.format(self.config)
             raise TpsCritical(errmsg)
-	#print "SIG: cfg: " + cfg
         config = ConfigParser(cfg)
 
         try:
@@ -191,6 +189,7 @@ class Suite(object):
                 logname  = os.path.join(self.log_path, logname)
                 log.write('------------------------\n')
                 log.write('running test {0} = {1}\n'.format(shortname, test))
+                print '.',
                 run_test(testname, logname)
             except TpsCritical, e:
                 print 'test [%s]: critical error, aborting: [%s]' % (shortname, e)
@@ -207,6 +206,9 @@ class Suite(object):
                 log.write('    error in test {0}, exception [{1}]\n'.format(shortname, e))
                 failures.append((shortname, e, ))
                 while True:
+                    if self.yes:
+                        log.write('    user intervention: continue (assuming --yes)\n')
+                        continue
                     ans = raw_input('Abort or Continue? (A/C) ')
                     ans = ans.lower()
                     if ans in ('a', 'c'):
@@ -228,11 +230,14 @@ class Suite(object):
         log.write('------------------------\n')
         log.write('Test suite finished.\n')
         if not failures:
-            log.write('All tests OK\n')
+            msg = 'All tests OK\n'
         else:
-            log.write('FAILED: ')
+            msg = [ 'FAILED:' ]
             for fail in failures:
-                log.write(fail[0] + ' ')
+                msg.append(fail[0])
+            msg = ' '.join(msg)
+        print msg
+        log.write(msg)
         log.close()
 
 def get_serial():
@@ -368,6 +373,8 @@ def main():
                         help="run the batch in random order", )
     parser.add_option("-w", "--write-config", action="store_true",
                         help="write configuration data to config file", )
+    parser.add_option("-y", "--yes", action="store_true",
+                        help="assume all user interventions are affirmative", )
 
     (options, args) = parser.parse_args()
 
