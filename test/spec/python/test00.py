@@ -166,36 +166,36 @@ def main (default_directory='.'):
 	value1 = adc_value(adc.rd_reg16(0x80));
 
 	# Check the values of the ADC.
-	if(float(value8) < 2.0) :
-		raise TpsError ("Error in VS_VADJ, value " + value8 + " < 2.0")
+	if(float(value8) < 1.7) :
+		raise TpsError ("Error in VS_VADJ, value " + value8 + " < 1.7 V")
 	print "VS_VADJ = " + value8
 
 	if(float(value7) < 2.0) :
-		raise TpsError ("Error in VS_P12V_x, value " + value7 + " < 2.0")
+		raise TpsError ("Error in VS_P12V_x, value " + value7 + " < 2.0 V")
 	print "VS_P12V_x = " + value7
 
 	if(float(value6) < 1.57) :
-		raise TpsError ("Error in VS_P3V3_x, value " + value6 + " < 1.57")
+		raise TpsError ("Error in VS_P3V3_x, value " + value6 + " < 1.57 V")
 	print "VS_P3V3_x = " + value6
 
 	if(float(value5) < 2.52) :
-		raise TpsWarning ("Error in P5V_BI, value " + value5 + " < 2.52")
+		print "Error in P5V_BI, value " + value5 + " < 2.52 V"
 	print "P5V_BI = " + value5
 
 	if(float(value4) > 2.0) :
-		raise TpsWarning ("Error in M2V_BI, value " + value4 + " > 2.0")
+		print "Error in M2V_BI, value " + value4 + " > 2.0 V"
 	print "M2V_BI = " + value4
 
 	if(float(value3) > 2.28) :
-		raise TpsWarning ("Error in M5V2_BI, value " + value3 + " > 2.28")
+		print "Error in M5V2_BI, value " + value3 + " > 2.28 V"
 	print "M5V2_BI = " + value3
 
 	if(float(value2) > 2.4) :
-		raise  TpsWarning ("Error in M12V_BI, value " + value2 + " > 2.4")
+		print "Error in M12V_BI, value " + value2 + " > 2.4 V"
 	print "M12V_BI = " + value2
 
 	if(float(value1) < 2.0) :
-		raise TpsWarning( "Error in P12V_BI, value " + value1 + " < 2.0")
+		print "Error in P12V_BI, value " + value1 + " < 2.0 V"
 	print "P12V_BI = " + value1
 
 if __name__ == '__main__' :
