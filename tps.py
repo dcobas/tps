@@ -183,6 +183,7 @@ class Suite(object):
                 logname  = os.path.join(self.log_path, logname)
                 log.write('------------------------\n')
                 log.write('running test {0} = {1}\n'.format(shortname, test))
+                print '.',
                 run_test(testname, logname)
             except TpsCritical, e:
                 print 'test [%s]: critical error, aborting: [%s]' % (shortname, e)
