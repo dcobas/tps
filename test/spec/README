@@ -16,11 +16,11 @@ This batch of test makes a connectivity test of the SPEC's components.
 	- test01: checks the low speed pins of FMC connector (low count connector).
 	- test02: checks the EEPROM of the GENNUM chip. 
 	- test03: loads a firmware file to Flash memory and boots from it. The FW just blink the leds.
-	- test04: not present now. It should be SFP connectivity test.
-	- test05: check SATA ports and high speed pins on FMC connector (low count connector).
-	- test06: check Silabs SI570 oscillator.
-	- test07: check data and address lines of DDR memory.
-	- test08: check PLL and rest of oscillators on SPEC board.
+	- test04: not present yet. It should be SFP connectivity test.
+	- test05: checks SATA ports and high speed pins on FMC connector (low count connector).
+	- test06: checks Silabs SI570 oscillator.
+	- test07: checks data and address lines of DDR memory.
+	- test08: checks PLL and rest of oscillators on SPEC board.
 
 This tests are made to work stand-alone too. So, it is possible to call each one using 'python test0x.py'
 

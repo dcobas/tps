@@ -6,6 +6,10 @@ import time
 import os
 from tpsexcept import *
 
+"""
+test00: checks voltage of the power pins in FMC connector.
+"""
+
 BASE_GPIO = 0x40000
 BASE_MINIC = 0xc0000
 GPIO_CODR = 0x0

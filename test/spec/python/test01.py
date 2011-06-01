@@ -8,6 +8,10 @@ import errno
 
 from tpsexcept import *		# jdgc
 
+"""
+test01: checks the low speed pins of FMC connector (low count connector).
+"""
+
 tests_path = '.'
 default_log_path = '.'
 

@@ -9,6 +9,10 @@ import os.path
 from ctypes import *
 from tpsexcept import *
 
+"""
+test03: loads a firmware file to Flash memory and boots from it. The FW just blinks the leds.
+"""
+
 class CGennumFlash :
     	GENNUM_FLASH = 1;
     	GENNUM_FPGA = 2;
@@ -59,7 +63,7 @@ def main (default_directory='.'):
     sys.stdout = tmp_stdout;
     sys.stdin = tmp_stdin;
     if (ask == "N") :
-	raise TpsError("Error loading FW through the Flash memory");
+	raise TpsError("Error loading FW through the Flash memory or there is a problem with the LEDs");
 
 if __name__ == '__main__' :
 	main();

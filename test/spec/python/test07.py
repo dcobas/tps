@@ -10,6 +10,9 @@ import i2c
 import gn4124
 import os
 
+"""
+test07: checks data and address lines of DDR memory.
+"""
 
 GN4124_CSR = 0x0
 

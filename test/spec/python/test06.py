@@ -7,6 +7,10 @@ import time
 import os
 from tpsexcept import *
 
+"""
+test06: checks Silabs SI570 oscillator.
+"""
+
 BASE_GPIO = 0x40000
 BASE_MINIC = 0xc0000
 GPIO_CODR = 0x0

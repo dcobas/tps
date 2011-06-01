@@ -10,7 +10,9 @@ import time
 import os
 from tpsexcept import *
 
-
+"""
+test05: check SATA ports and high speed pins on FMC connector (low count connector).
+"""
 
 TX_SIZE = 32;          # Number of Bytes to TX
 RX_SIZE = TX_SIZE;     # Number of Bytes to RX

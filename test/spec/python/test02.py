@@ -6,6 +6,10 @@ import rr
 import time
 import os
 
+"""
+test02: checks the EEPROM of the GENNUM chip.
+"""
+
 class EEPROM_GENNUM:
 
     LB_CTL = 0x804;
