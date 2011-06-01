@@ -262,7 +262,7 @@ class EEPROM_GENNUM:
         if written == len(file_data):
             print 'EEPROM written with '+file_name+' content!'
         else :
-            raise TpsUser ("ERROR writting to the EEPROM: Written lenght doesn't correspond with the length of the file.")
+            raise TpsError ("ERROR writting to the EEPROM: Written lenght doesn't correspond with the length of the file.")
         return 0
 
     def compare_eeprom_with_file(self, file_name):
@@ -292,7 +292,7 @@ class EEPROM_GENNUM:
             if file_data[i] == eeprom_data[i]:
                 print 'EEPROM= %.2X, FILE= %.2X => OK' %(eeprom_data[i],file_data[i])
             else :
-                raise TpsUser('EEPROM= %.2X, FILE= %.2X => ERROR' %(eeprom_data[i],file_data[i]))
+                raise TpsError('EEPROM= %.2X, FILE= %.2X => ERROR' %(eeprom_data[i],file_data[i]))
 
 def main (default_directory='.'):
 

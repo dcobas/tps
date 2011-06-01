@@ -391,7 +391,7 @@ def main (default_directory='.'):
 
     if (p.is_alive()) :
 	p.terminate();
-	raise TpsUser("Test SATA -> DP0: Error in DP0, RX")
+	raise TpsError("Test SATA -> DP0: Error in DP0, RX")
  
     time.sleep(2);
 
@@ -410,7 +410,7 @@ def main (default_directory='.'):
 
     if (p.is_alive()) :
 	p.terminate();
-	raise TpsUser ("Test DP0 -> SATA 0: Error in SATA 0, RX")
+	raise TpsError ("Test DP0 -> SATA 0: Error in SATA 0, RX")
  
     time.sleep(2)    
 
