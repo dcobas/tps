@@ -200,6 +200,9 @@ class Suite(object):
                 log.write('    error in test {0}, exception [{1}]\n'.format(shortname, e))
                 failures.append((shortname, e, ))
                 while True:
+                    if self.yes:
+                        log.write('    user intervention: continue (assuming --yes)\n')
+                        continue
                     ans = raw_input('Abort or Continue? (A/C) ')
                     ans = ans.lower()
                     if ans in ('a', 'c'):
@@ -364,6 +367,8 @@ def main():
                         help="run the batch in random order", )
     parser.add_option("-w", "--write-config", action="store_true",
                         help="write configuration data to config file", )
+    parser.add_option("-y", "--yes", action="store_true",
+                        help="assume all user interventions are affirmative", )
 
     (options, args) = parser.parse_args()
 
