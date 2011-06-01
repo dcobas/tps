@@ -171,7 +171,7 @@ def main (default_directory='.'):
 
     if (error) :
 	print "RESULT: [FAILED]"
-	raise TpsError ("Error in DDR address lines. Please check log file for more information")
+	raise TpsError ("Error in DDR data lines. Please check log file for more information")
     else :
 	print "RESULT: [OK]"
 
