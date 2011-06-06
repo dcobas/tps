@@ -3,7 +3,7 @@
 rm -fr /tmp/tps*
 
 serial=$1
-if [ x$1 == x"" ]; then
+if [ x$1 = x"" ]; then
 	echo -n "Please, input SERIAL number: "
         read serial
 fi
