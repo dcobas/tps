@@ -10,6 +10,7 @@ import sys
 import rr
 import time
 import os
+from tpsexcept import *
 
 """
 test02: checks the EEPROM of the GENNUM chip.
