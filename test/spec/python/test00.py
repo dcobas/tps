@@ -166,8 +166,8 @@ def main (default_directory='.'):
 	value1 = adc_value(adc.rd_reg16(0x80));
 
 	# Check the values of the ADC.
-	if(float(value8) < 1.61) or (float(value8) > 1.72) :
-		raise TpsError ("Error in VS_VADJ, value x=" + value8 + ". x > 1.72 V or x < 1.61 V")
+	if(float(value8) < 1.61) or (float(value8) > 1.73) :
+		raise TpsError ("Error in VS_VADJ, value x=" + value8 + ". x > 1.73 V or x < 1.61 V")
 	print "VS_VADJ = " + value8
 
 	if(float(value7) < 1.90) or (float(value7) > 2.11):
