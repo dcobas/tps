@@ -27,17 +27,24 @@ default_log_name     = 'tps_run_{runid}_{timestamp}_{board}_{serial}.txt'
 default_test_pattern = r'test[0-9][0-9]'
 default_test_syntax  = r'(test)?(\d\d)'
 
-def run_test(testname, logname):
+def run_test(testname, logname, yes=False):
     """run test testname with output redirected to logname
+
+    If yes is true, assume affirmative answers from the user
     """
     try:
         tmpout = sys.stdout
         sys.stdout = open(logname, 'w')
+        if yes:
+            tmpin = sys.stdin
+            sys.stdin = open('/dev/null')
         mod = __import__(testname, globals(), locals(), [])
         mod.main(default_directory='./test/spec/python')
     finally:
         sys.stdout.close()
         sys.stdout = tmpout
+        if yes:
+            sys.stdin  = tmpin
 
 class Suite(object):
     def __init__(self, cfgfilename=default_config_file):
@@ -190,7 +197,7 @@ class Suite(object):
                 log.write('------------------------\n')
                 log.write('running test {0} = {1}\n'.format(shortname, test))
                 print '.',
-                run_test(testname, logname)
+                run_test(testname, logname, yes=self.yes)
             except TpsCritical, e:
                 print 'test [%s]: critical error, aborting: [%s]' % (shortname, e)
                 log.write('    critical error in test {0}, exception [{1}]\n'.format(shortname, e))
