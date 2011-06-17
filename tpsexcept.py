@@ -31,12 +31,5 @@ class TpsBadTestNo(TpsInvalid):
     """reserved: a bad test number was given"""
     pass
 
-def raw_input(msg, default='y'):
-    try:
-        ret = __builtins__.raw_input(msg)
-    except EOFError:
-        return default
-    return ret
-
 if __name__ == '__main__':
     pass

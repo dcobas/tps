@@ -1,3 +1,4 @@
+#!   /user/dcobas/2.7.1/bin/python
 #!   /usr/bin/env   python
 #    coding: utf8
 
@@ -27,6 +28,15 @@ default_log_name     = 'tps_run_{runid}_{timestamp}_{board}_{serial}.txt'
 default_test_pattern = r'test[0-9][0-9]'
 default_test_syntax  = r'(test)?(\d\d)'
 
+original_raw_input = raw_input
+
+def tps_raw_input(msg, default='y'):
+    try:
+        ret = original_raw_input(msg)
+    except EOFError:
+        return default
+    return ret
+
 def run_test(testname, logname, yes=False):
     """run test testname with output redirected to logname
 
@@ -38,13 +48,15 @@ def run_test(testname, logname, yes=False):
         if yes:
             tmpin = sys.stdin
             sys.stdin = open('/dev/null')
+            __builtins__.raw_input = tps_raw_input
         mod = __import__(testname, globals(), locals(), [])
         mod.main(default_directory='./test/spec/python')
     finally:
         sys.stdout.close()
         sys.stdout = tmpout
         if yes:
-            sys.stdin  = tmpin
+            sys.stdin = tmpin
+            raw_input = original_raw_input
 
 class Suite(object):
     def __init__(self, cfgfilename=default_config_file):
