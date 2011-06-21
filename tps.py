@@ -1,4 +1,3 @@
-#!   /user/dcobas/2.7.1/bin/python
 #!   /usr/bin/env   python
 #    coding: utf8
 
@@ -16,6 +15,7 @@ import stat
 import datetime
 import random
 import warnings
+import zipfile
 
 from ConfigParser import ConfigParser, NoOptionError
 from optparse import OptionParser
@@ -25,6 +25,7 @@ from tpsexcept import *
 default_config_file  = 'tpsdefault.cfg'
 default_log_pattern  = 'tps_tst_{runid}_{timestamp}_{board}_{serial}_{number}.txt'
 default_log_name     = 'tps_run_{runid}_{timestamp}_{board}_{serial}.txt'
+default_zip_name     = 'zip_run_{runid}_{timestamp}_{board}_{serial}.zip'
 default_test_pattern = r'test[0-9][0-9]'
 default_test_syntax  = r'(test)?(\d\d)'
 
@@ -36,6 +37,11 @@ def tps_raw_input(msg, default='y'):
     except EOFError:
         return default
     return ret
+
+def make_zip(zipname, ziplist):
+    with zipfile.ZipFile(zipname, 'w') as z:
+        for f in ziplist:
+            z.write(f)
 
 def run_test(testname, logname, yes=False):
     """run test testname with output redirected to logname
@@ -68,6 +74,7 @@ class Suite(object):
         self.config       =  default_config_file
         self.log_pattern  =  default_log_pattern
         self.log_name     =  default_log_name
+        self.zip_name     =  default_zip_name
         #self.read_config(self.config)
 
     def missing(self):
@@ -185,6 +192,12 @@ class Suite(object):
                                 runid=runid)
         logfilename = os.path.join(self.log_path, logfilename)
         log         = file(logfilename, 'wb')
+        zipfilename = self.zip_name.format(board=self.board,
+                                serial=self.serial,
+                                timestamp=ts,
+                                runid=runid)
+        zipfilename = os.path.join(self.log_path, zipfilename)
+        ziplist     = [ logfilename ]
 
         if self.test_path not in sys.path:
             sys.path.append(self.test_path)
@@ -206,6 +219,7 @@ class Suite(object):
                                 runid = runid,
                                 number=shortname)
                 logname  = os.path.join(self.log_path, logname)
+                ziplist.append(logname)
                 log.write('------------------------\n')
                 log.write('running test {0} = {1}\n'.format(shortname, test))
                 print '.',
@@ -258,6 +272,8 @@ class Suite(object):
         print msg
         log.write(msg)
         log.close()
+
+        make_zip(zipfilename, ziplist)
 
 def get_serial():
     """return serial number of current board to test
